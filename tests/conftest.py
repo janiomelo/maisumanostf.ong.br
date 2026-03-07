@@ -4,6 +4,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
+from app.autenticacao import criar_usuario
 from app import create_app
 
 
@@ -14,12 +15,13 @@ def app_instance(tmp_path):
         {
             "TESTING": True,
             "SQLALCHEMY_DATABASE_URI": f"sqlite:///{banco_teste}",
-            "AUTH_USUARIOS": {
-                "editor@teste.local": {"senha": "123456", "papel": "editor"},
-                "admin@teste.local": {"senha": "abc123", "papel": "admin"},
-            },
         }
     )
+
+    with app.app_context():
+        criar_usuario("editor@teste.local", "123456", papel="editor")
+        criar_usuario("admin@teste.local", "abc123", papel="admin")
+
     return app
 
 

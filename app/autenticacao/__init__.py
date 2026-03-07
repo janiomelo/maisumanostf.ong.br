@@ -1,13 +1,15 @@
 from .servico import (
     autenticar,
-    carregar_usuarios_ambiente,
+    bootstrap_admin_por_ambiente,
+    criar_usuario,
     limpar_sessao_usuario,
     registrar_sessao_usuario,
 )
 
 __all__ = [
     "autenticar",
-    "carregar_usuarios_ambiente",
+    "bootstrap_admin_por_ambiente",
+    "criar_usuario",
     "limpar_sessao_usuario",
     "registrar_sessao_usuario",
 ]

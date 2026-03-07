@@ -1,46 +1,73 @@
 import os
-from collections.abc import Mapping
 
+from sqlalchemy.exc import OperationalError, ProgrammingError
+from sqlalchemy.orm.exc import NoResultFound
 from flask import session
 
 from app.autorizacao import normalizar_papel
+from app.dados.base import db
+from app.dados.modelos import Usuario
 
 
-def carregar_usuarios_ambiente() -> dict[str, dict[str, str]]:
-    usuarios: dict[str, dict[str, str]] = {}
-
-    email_admin = os.getenv("AUTH_USER_ADMIN_EMAIL", "").strip().lower()
-    senha_admin = os.getenv("AUTH_USER_ADMIN_PASSWORD", "")
-    papel_admin = os.getenv("AUTH_USER_ADMIN_PAPEL", "admin")
-
-    if email_admin and senha_admin:
-        usuarios[email_admin] = {
-            "senha": senha_admin,
-            "papel": normalizar_papel(papel_admin),
-        }
-
-    return usuarios
-
-
-def autenticar(
-    email: str,
-    senha: str,
-    usuarios_configurados: Mapping[str, Mapping[str, str]],
-) -> dict[str, str] | None:
+def autenticar(email: str, senha: str) -> dict[str, str] | None:
     email_normalizado = email.strip().lower()
-    usuario = usuarios_configurados.get(email_normalizado)
-
-    if not usuario:
+    if not email_normalizado or not senha:
         return None
 
-    senha_esperada = str(usuario.get("senha", ""))
-    if senha_esperada != senha:
+    usuario = Usuario.query.filter_by(email=email_normalizado, ativo=True).first()
+    if not usuario or not usuario.validar_senha(senha):
         return None
 
     return {
-        "email": email_normalizado,
-        "papel": normalizar_papel(str(usuario.get("papel", "nao_editor"))),
+        "email": usuario.email,
+        "papel": normalizar_papel(usuario.papel),
     }
+
+
+def criar_usuario(email: str, senha: str, papel: str = "nao_editor") -> Usuario:
+    email_normalizado = email.strip().lower()
+    if not email_normalizado:
+        raise ValueError("Email e obrigatorio")
+
+    if not senha:
+        raise ValueError("Senha e obrigatoria")
+
+    existe = Usuario.query.filter_by(email=email_normalizado).first()
+    if existe:
+        raise ValueError("Ja existe usuario com esse email")
+
+    usuario = Usuario(
+        email=email_normalizado,
+        papel=normalizar_papel(papel),
+        ativo=True,
+    )
+    usuario.definir_senha(senha)
+    db.session.add(usuario)
+    db.session.commit()
+    return usuario
+
+
+def bootstrap_admin_por_ambiente() -> None:
+    email_admin = os.getenv("AUTH_USER_ADMIN_EMAIL", "").strip().lower()
+    senha_admin = os.getenv("AUTH_USER_ADMIN_PASSWORD", "")
+    papel_admin = normalizar_papel(os.getenv("AUTH_USER_ADMIN_PAPEL", "admin"))
+
+    if not email_admin or not senha_admin:
+        return
+
+    try:
+        _ = Usuario.query.filter_by(email=email_admin).one()
+        return
+    except NoResultFound:
+        pass
+    except (OperationalError, ProgrammingError):
+        # O bootstrap nao deve quebrar quando a migration ainda nao foi aplicada.
+        return
+
+    usuario = Usuario(email=email_admin, papel=papel_admin, ativo=True)
+    usuario.definir_senha(senha_admin)
+    db.session.add(usuario)
+    db.session.commit()
 
 
 def registrar_sessao_usuario(email: str, papel: str) -> None:

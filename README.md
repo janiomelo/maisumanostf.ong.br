@@ -39,6 +39,7 @@ make test-unit
 make test-functional
 make test-e2e
 make test-cov
+make user-create EMAIL=editor@dominio SENHA=trocar PAPEL=editor
 ```
 
 ## Configuração por ambiente
@@ -54,7 +55,7 @@ Variáveis de autenticação inicial (sessão):
 
 - `AUTH_USER_ADMIN_EMAIL`, `AUTH_USER_ADMIN_PASSWORD`, `AUTH_USER_ADMIN_PAPEL`
 - Esta configuração cria apenas o admin bootstrap no ambiente
-- Outros usuários devem ser criados pela camada de gestão no ambiente real
+- Demais usuários devem ser cadastrados no banco (ex.: `make user-create ...`)
 
 Após alterar variáveis, rode `make restart`.
 

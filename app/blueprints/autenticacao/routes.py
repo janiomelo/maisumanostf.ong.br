@@ -1,4 +1,4 @@
-from flask import Blueprint, current_app, g, redirect, render_template, request, url_for
+from flask import Blueprint, g, redirect, render_template, request, url_for
 
 from app.autenticacao import autenticar, limpar_sessao_usuario, registrar_sessao_usuario
 
@@ -23,7 +23,7 @@ def processar_entrada():
     senha = request.form.get("senha", "")
     proximo = request.form.get("proximo", "")
 
-    usuario = autenticar(email, senha, current_app.config.get("AUTH_USUARIOS", {}))
+    usuario = autenticar(email, senha)
     if not usuario:
         erro = "Credenciais invalidas. Verifique e tente novamente."
         return render_template("autenticacao/entrar.html", erro=erro, proximo=proximo), 401
