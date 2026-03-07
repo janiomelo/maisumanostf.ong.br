@@ -111,6 +111,12 @@ def test_wiki_indice_publica(client):
 
 
 @pytest.mark.functional
+def test_wiki_sem_barra_final_nao_redireciona(client):
+    response = client.get("/wiki")
+    assert response.status_code == 200
+
+
+@pytest.mark.functional
 def test_wiki_estatuto_publico(client):
     response = client.get("/wiki/estatuto-basico-ampliado")
 

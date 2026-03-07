@@ -12,7 +12,7 @@ def carregar_contexto_de_papel() -> None:
 	g.papel_atual = normalizar_papel(request.headers.get("X-Papel-Usuario"))
 
 
-@wiki_bp.get("/")
+@wiki_bp.get("/", strict_slashes=False)
 def indice_wiki():
 	paginas = listar_paginas_wiki()
 	return render_template("wiki/indice.html", paginas=paginas)
