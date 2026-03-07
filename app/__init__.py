@@ -7,8 +7,15 @@ from .dados import inicializar_camada_de_dados
 
 
 def _normalizar_database_url(raw_url: str) -> str:
+    if raw_url.startswith("postgresql+psycopg://"):
+        return raw_url
+
+    if raw_url.startswith("postgresql://"):
+        return raw_url.replace("postgresql://", "postgresql+psycopg://", 1)
+
     if raw_url.startswith("postgres://"):
-        return raw_url.replace("postgres://", "postgresql://", 1)
+        return raw_url.replace("postgres://", "postgresql+psycopg://", 1)
+
     return raw_url
 
 

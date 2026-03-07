@@ -64,4 +64,16 @@ def test_seed_wiki_apenas_em_teste(tmp_path):
 @pytest.mark.unit
 def test_normalizar_database_url_railway():
     raw = "postgres://user:pass@host:5432/dbname"
-    assert _normalizar_database_url(raw) == "postgresql://user:pass@host:5432/dbname"
+    assert _normalizar_database_url(raw) == "postgresql+psycopg://user:pass@host:5432/dbname"
+
+
+@pytest.mark.unit
+def test_normalizar_database_url_postgresql_sem_driver():
+    raw = "postgresql://user:pass@host:5432/dbname"
+    assert _normalizar_database_url(raw) == "postgresql+psycopg://user:pass@host:5432/dbname"
+
+
+@pytest.mark.unit
+def test_normalizar_database_url_preserva_quando_ja_tem_driver():
+    raw = "postgresql+psycopg://user:pass@host:5432/dbname"
+    assert _normalizar_database_url(raw) == raw
