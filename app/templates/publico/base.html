@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="pt-BR" data-theme="auto">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Mais Uma no STF{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+  <script defer src="{{ url_for('static', filename='main.js') }}"></script>
+</head>
+<body>
+  <header class="topbar">
+    <div class="container nav-wrap">
+      <a class="logo" href="{{ url_for('main.home') }}">Mais Uma No STF</a>
+      <nav>
+        <a href="#manifesto">Manifesto</a>
+        <a href="#sobre">Sobre</a>
+        <a href="#participe">Participe</a>
+        <a href="#transparencia">Transparência</a>
+      </nav>
+      <div class="auth-area">
+        <button class="theme-btn" id="themeToggle" type="button">☼</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-grid">
+      <section>
+        <h3>Mais Uma No STF</h3>
+        <p>
+          Campanha cívica por representatividade mínima feminina no Supremo Tribunal Federal
+          da República Federativa do Brasil 🇧🇷 
+        </p>
+      </section>
+
+      <section>
+        <h3>Mapa do Site</h3>
+        <ul>
+          <li><a href="#manifesto">Manifesto</a></li>
+          <li><a href="#dados">Dados</a></li>
+          <li><a href="#sobre">Sobre</a></li>
+          <li><a href="#participe">Participe</a></li>
+        </ul>
+      </section>
+
+      <section>
+        <h3>Transparência</h3>
+        <ul>
+          <li><a href="#transparencia">Desenvolvedor e primeiro subscritor</a></li>
+          <li><a href="https://github.com/janiomelo" target="_blank" rel="noopener">github.com/janiomelo</a></li>
+        </ul>
+      </section>
+    </div>
+    <div class="container footer-bottom">
+      <small>Fase 1 do site institucional · Versão 0.1.0 - beta · Este site foi produzido com apoio de um agente de IA.</small>
+    </div>
+  </footer>
+
+  <script>
+    const root = document.documentElement;
+    const key = 'theme';
+    const saved = localStorage.getItem(key);
+    if (saved) root.setAttribute('data-theme', saved);
+    document.getElementById('themeToggle')?.addEventListener('click', () => {
+      const current = root.getAttribute('data-theme') || 'auto';
+      const next = current === 'light' ? 'dark' : current === 'dark' ? 'auto' : 'light';
+      root.setAttribute('data-theme', next);
+      localStorage.setItem(key, next);
+    });
+  </script>
+  {% block scripts %}{% endblock %}
+</body>
+</html>

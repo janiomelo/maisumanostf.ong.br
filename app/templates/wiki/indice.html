@@ -1,0 +1,20 @@
+{% extends "publico/base.html" %}
+
+{% block title %}Wiki | Mais Uma no STF{% endblock %}
+
+{% block content %}
+<section class="learn-more-box" id="wiki-indice" aria-label="Indice da Wiki">
+  <h1>Wiki da Campanha</h1>
+  <p>Espaco de publicacao e organizacao dos conteudos estruturantes do movimento.</p>
+  <ul class="learn-more-list">
+    {% for pagina in paginas %}
+      <li>
+        <a href="{{ url_for('wiki.pagina_wiki', slug=pagina.slug) }}">{{ pagina.titulo }}</a>
+        <small> - {{ pagina.resumo }}</small>
+      </li>
+    {% else %}
+      <li>Nenhuma pagina wiki publicada ainda.</li>
+    {% endfor %}
+  </ul>
+</section>
+{% endblock %}
