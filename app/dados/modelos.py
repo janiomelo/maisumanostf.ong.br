@@ -1,5 +1,7 @@
 from datetime import UTC, datetime
 
+from werkzeug.security import check_password_hash, generate_password_hash
+
 from .base import db
 
 
@@ -22,3 +24,31 @@ class WikiPagina(db.Model):
         default=_agora_utc,
         onupdate=_agora_utc,
     )
+
+
+class Usuario(db.Model):
+    __tablename__ = "usuarios"
+
+    id = db.Column(db.Integer, primary_key=True)
+    email = db.Column(db.String(255), unique=True, nullable=False, index=True)
+    senha_hash = db.Column(db.String(255), nullable=False)
+    papel = db.Column(db.String(40), nullable=False, default="nao_editor")
+    ativo = db.Column(db.Boolean, nullable=False, default=True)
+
+    @staticmethod
+    def _agora_utc() -> datetime:
+        return datetime.now(UTC)
+
+    criado_em = db.Column(db.DateTime, nullable=False, default=_agora_utc)
+    atualizado_em = db.Column(
+        db.DateTime,
+        nullable=False,
+        default=_agora_utc,
+        onupdate=_agora_utc,
+    )
+
+    def definir_senha(self, senha_plana: str) -> None:
+        self.senha_hash = generate_password_hash(senha_plana)
+
+    def validar_senha(self, senha_plana: str) -> bool:
+        return check_password_hash(self.senha_hash, senha_plana)

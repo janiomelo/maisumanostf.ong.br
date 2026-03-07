@@ -1,6 +1,6 @@
 # maisumanostf.ong.br
 
-Home da campanha em formato "Wiki de Urgência" (fase 1).
+Home da campanha em formato "Wiki de Urgência".
 
 ## Escopo atual (primeiro commit)
 
@@ -8,8 +8,9 @@ Home da campanha em formato "Wiki de Urgência" (fase 1).
 - Contador regressivo para a próxima vaga
 - Gráfico dinâmico (Chart.js) com histórico + cenários (risco e campanha)
 - Conteúdo institucional (resumo, cronologia, vagas e referências)
+- Wiki dinâmica persistida em banco com edição autenticada por papel
 
-Nesta fase não há banco de dados, autenticação ou coleta de assinaturas.
+Nesta fase a assinatura pública ainda não está ativa.
 
 ## Stack
 
@@ -38,6 +39,7 @@ make test-unit
 make test-functional
 make test-e2e
 make test-cov
+make user-create EMAIL=editor@dominio SENHA=trocar PAPEL=editor
 ```
 
 ## Configuração por ambiente
@@ -49,11 +51,19 @@ As variáveis da home ficam no `.env`:
 - `VACANCY_CARMEN_DATE` (YYYY-MM-DD)
 - `VACANCY_GILMAR_DATE` (YYYY-MM-DD)
 
+Variáveis de autenticação inicial (sessão):
+
+- `AUTH_USER_ADMIN_EMAIL`, `AUTH_USER_ADMIN_PASSWORD`, `AUTH_USER_ADMIN_PAPEL`
+- Esta configuração cria apenas o admin bootstrap no ambiente
+- Demais usuários devem ser cadastrados no banco (ex.: `make user-create ...`)
+
 Após alterar variáveis, rode `make restart`.
 
 ## Interfaces públicas
 
 - Home: `/`
+- Login: `/entrar`
+- Logout: `/sair`
 - API principal: `/api/contagem-regressiva`
 	- Resposta JSON: `{"alvo": "<ISO datetime>"}`
 - API legada (em transição): `/api/countdown`

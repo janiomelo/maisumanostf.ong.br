@@ -1,8 +1,11 @@
 import os
 
-from flask import Flask
+from flask import Flask, g, session
 
+from .autenticacao import bootstrap_admin_por_ambiente
+from .autorizacao import normalizar_papel
 from .blueprints import register_blueprints
+from .cli.usuarios import registrar_comandos_usuarios
 from .dados import inicializar_camada_de_dados
 
 
@@ -36,7 +39,18 @@ def create_app(test_config: dict | None = None) -> Flask:
     if test_config:
         app.config.update(test_config)
 
+    @app.before_request
+    def carregar_contexto_autenticacao() -> None:
+        g.usuario_email = session.get("usuario_email")
+        g.papel_atual = normalizar_papel(session.get("papel_atual"))
+
     inicializar_camada_de_dados(app)
+    registrar_comandos_usuarios(app)
+
+    if not app.config.get("TESTING", False):
+        with app.app_context():
+            bootstrap_admin_por_ambiente()
+
     register_blueprints(app)
 
     return app
