@@ -2,6 +2,10 @@
 
 {% block title %}Editar {{ pagina.titulo }} | Wiki{% endblock %}
 
+{% block head_extras %}
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/easymde/dist/easymde.min.css">
+{% endblock %}
+
 {% block content %}
 <section class="learn-more-box" id="wiki-editar-pagina" aria-label="Edicao de pagina wiki">
   <h1>Edicao: {{ pagina.titulo }}</h1>
@@ -20,11 +24,28 @@
     </p>
     <p>
       <label for="conteudo_markdown"><strong>Conteudo (Markdown)</strong></label><br>
-      <textarea id="conteudo_markdown" name="conteudo_markdown" rows="16" required style="width:100%;max-width:820px;">{{ pagina.conteudo_markdown }}</textarea>
+      <textarea id="conteudo_markdown" name="conteudo_markdown" rows="16" required>{{ pagina.conteudo_markdown }}</textarea>
     </p>
     <p>
       <button class="cta-btn" type="submit">Salvar pagina</button>
     </p>
   </form>
 </section>
+{% endblock %}
+
+{% block scripts %}
+  <script src="https://cdn.jsdelivr.net/npm/easymde/dist/easymde.min.js"></script>
+  <script>
+    const inputMarkdown = document.getElementById('conteudo_markdown');
+    if (inputMarkdown && window.EasyMDE) {
+      new EasyMDE({
+        element: inputMarkdown,
+        spellChecker: false,
+        status: ['lines', 'words'],
+        minHeight: '320px',
+        placeholder: 'Escreva em Markdown...',
+        autosave: { enabled: false },
+      });
+    }
+  </script>
 {% endblock %}

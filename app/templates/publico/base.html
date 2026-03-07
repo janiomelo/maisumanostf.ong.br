@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{% block title %}Mais Uma no STF{% endblock %}</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+  {% block head_extras %}{% endblock %}
   <script defer src="{{ url_for('static', filename='main.js') }}"></script>
 </head>
 <body>
