@@ -24,7 +24,7 @@ def home():
     }
 
     html = render_template(
-        "home.html",
+        "publico/home.html",
         countdown_target=target_raw,
         chart_payload=chart_payload,
         vacancy_labels=vacancy_labels,
