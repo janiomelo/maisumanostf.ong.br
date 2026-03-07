@@ -1,0 +1,35 @@
+name: CI - Testes
+
+on:
+  pull_request:
+  push:
+    branches:
+      - master
+      - main
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-testes-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  testes:
+    name: Testes e cobertura
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Verificar Docker Compose
+        run: docker compose version
+
+      - name: Preparar .env e pastas locais
+        run: make init
+
+      - name: Build da imagem da aplicacao
+        run: make build
+
+      - name: Rodar testes com cobertura minima
+        run: make test-cov
