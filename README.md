@@ -33,6 +33,11 @@ make logs
 make restart
 make refresh
 make down
+make test
+make test-unit
+make test-functional
+make test-e2e
+make test-cov
 ```
 
 ## Configuração por ambiente
@@ -45,6 +50,25 @@ As variáveis da home ficam no `.env`:
 - `VACANCY_GILMAR_DATE` (YYYY-MM-DD)
 
 Após alterar variáveis, rode `make restart`.
+
+## Interfaces públicas
+
+- Home: `/`
+- API principal: `/api/contagem-regressiva`
+	- Resposta JSON: `{"alvo": "<ISO datetime>"}`
+- API legada (em transição): `/api/countdown`
+	- Mantida temporariamente para compatibilidade
+	- Use a rota nova em português
+
+## Política de idioma (português first)
+
+Este repositório adota `português first` para interfaces públicas e documentação.
+
+- URLs públicas devem usar português, quando tecnicamente viável.
+- Parâmetros públicos (rota, query string e campos JSON) devem usar português.
+- Outros idiomas só são usados para termos consagrados de tecnologia e nomes de ferramentas.
+
+Regras detalhadas: `docs/politica-idioma.md`.
 
 ## Próximas fases
 
