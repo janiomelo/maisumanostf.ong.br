@@ -1,7 +1,7 @@
 import pytest
 
 from app import create_app, main
-from app.dados.base import inicializar_camada_de_dados
+from app.dados.base import db
 
 
 @pytest.mark.unit
@@ -17,13 +17,8 @@ def test_modulo_compatibilidade_expoe_componentes_legados():
 
 
 @pytest.mark.unit
-def test_inicializar_camada_de_dados_retorna_none():
-    assert inicializar_camada_de_dados() is None
-
-
-@pytest.mark.unit
 def test_factory_registra_blueprints_esperados():
-    app = create_app()
+    app = create_app({"SQLALCHEMY_DATABASE_URI": "sqlite:///:memory:"})
     nomes = sorted(app.blueprints.keys())
 
     assert "main" in nomes
@@ -31,3 +26,10 @@ def test_factory_registra_blueprints_esperados():
     assert "apoios" in nomes
     assert "defesas" in nomes
     assert "admin" in nomes
+
+
+@pytest.mark.unit
+def test_factory_inicializa_extensao_db():
+    app = create_app({"SQLALCHEMY_DATABASE_URI": "sqlite:///:memory:"})
+    assert "sqlalchemy" in app.extensions
+    assert app.extensions["sqlalchemy"] is db

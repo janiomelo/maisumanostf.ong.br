@@ -8,9 +8,14 @@ from app import create_app
 
 
 @pytest.fixture
-def app_instance():
-    app = create_app()
-    app.config.update(TESTING=True)
+def app_instance(tmp_path):
+    banco_teste = tmp_path / "test.db"
+    app = create_app(
+        {
+            "TESTING": True,
+            "SQLALCHEMY_DATABASE_URI": f"sqlite:///{banco_teste}",
+        }
+    )
     return app
 
 

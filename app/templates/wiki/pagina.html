@@ -1,0 +1,19 @@
+{% extends "publico/base.html" %}
+
+{% block title %}{{ pagina.titulo }} | Wiki{% endblock %}
+
+{% block content %}
+<section class="learn-more-box" id="wiki-pagina" aria-label="Pagina da Wiki">
+  <h1>{{ pagina.titulo }}</h1>
+
+  {% for bloco in pagina.blocos %}
+    {% if bloco.tipo == "h2" %}
+      <h2>{{ bloco.texto }}</h2>
+    {% else %}
+      <p>{{ bloco.texto }}</p>
+    {% endif %}
+  {% endfor %}
+
+  <p><a href="{{ url_for('wiki.editar_pagina_wiki', slug=pagina.slug) }}">Solicitar edicao desta pagina</a></p>
+</section>
+{% endblock %}

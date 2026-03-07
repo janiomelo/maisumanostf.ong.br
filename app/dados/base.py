@@ -1,6 +1,15 @@
-"""Ponto de extensao para inicializacao de conexoes/repositorios de dados."""
+from flask import Flask
+from flask_sqlalchemy import SQLAlchemy
+
+db = SQLAlchemy()
 
 
-def inicializar_camada_de_dados() -> None:
-    # Sera conectado ao ORM/migrations quando a persistencia entrar em producao.
-    return None
+def inicializar_camada_de_dados(app: Flask) -> None:
+    db.init_app(app)
+
+    with app.app_context():
+        from . import modelos  # noqa: F401
+        from .semente import semear_wiki_inicial
+
+        db.create_all()
+        semear_wiki_inicial()

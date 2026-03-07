@@ -13,6 +13,9 @@ def test_create_app_registra_rotas_principais():
     assert "/" in rotas
     assert "/api/contagem-regressiva" in rotas
     assert "/api/countdown" in rotas
+    assert "/wiki/" in rotas
+    assert "/wiki/<slug>" in rotas
+    assert "/wiki/<slug>/editar" in rotas
 
 
 @pytest.mark.functional
@@ -94,3 +97,42 @@ def test_home_data_alvo_corresponde_ao_valor_configurado(client, monkeypatch):
     match = re.search(r'data-alvo="([^"]+)"', html)
     assert match is not None
     assert match.group(1) == "2030-11-12T13:14:15-03:00"
+
+
+@pytest.mark.functional
+def test_wiki_indice_publica(client):
+    response = client.get("/wiki/")
+
+    assert response.status_code == 200
+    html = response.get_data(as_text=True)
+    assert "Wiki da Campanha" in html
+    assert "Estatuto Basico Ampliado" in html
+    assert "/wiki/estatuto-basico-ampliado" in html
+
+
+@pytest.mark.functional
+def test_wiki_estatuto_publico(client):
+    response = client.get("/wiki/estatuto-basico-ampliado")
+
+    assert response.status_code == 200
+    html = response.get_data(as_text=True)
+    assert "Estatuto Basico Ampliado" in html
+    assert "Escopo inicial" in html
+
+
+@pytest.mark.functional
+def test_wiki_edicao_exige_papel_editor(client):
+    sem_permissao = client.get("/wiki/estatuto-basico-ampliado/editar")
+    assert sem_permissao.status_code == 403
+
+    com_permissao = client.get(
+        "/wiki/estatuto-basico-ampliado/editar",
+        headers={"X-Papel-Usuario": "editor"},
+    )
+    assert com_permissao.status_code == 200
+
+
+@pytest.mark.functional
+def test_wiki_retorna_404_para_slug_inexistente(client):
+    response = client.get("/wiki/pagina-inexistente")
+    assert response.status_code == 404
