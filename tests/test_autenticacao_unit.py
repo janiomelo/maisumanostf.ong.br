@@ -26,15 +26,12 @@ def test_autenticar_retorna_none_quando_senha_ou_email_invalidos():
 
 @pytest.mark.unit
 def test_carregar_usuarios_ambiente_ler_blocos_configurados(monkeypatch):
-    monkeypatch.setenv("AUTH_USER_1_EMAIL", "admin@teste.local")
-    monkeypatch.setenv("AUTH_USER_1_PASSWORD", "abc123")
-    monkeypatch.setenv("AUTH_USER_1_PAPEL", "admin")
-
-    monkeypatch.setenv("AUTH_USER_2_EMAIL", "editor@teste.local")
-    monkeypatch.setenv("AUTH_USER_2_PASSWORD", "123456")
-    monkeypatch.setenv("AUTH_USER_2_PAPEL", "editor")
+    monkeypatch.setenv("AUTH_USER_ADMIN_EMAIL", "admin@teste.local")
+    monkeypatch.setenv("AUTH_USER_ADMIN_PASSWORD", "abc123")
+    monkeypatch.setenv("AUTH_USER_ADMIN_PAPEL", "admin")
 
     usuarios = carregar_usuarios_ambiente()
 
     assert usuarios["admin@teste.local"]["papel"] == "admin"
-    assert usuarios["editor@teste.local"]["senha"] == "123456"
+    assert usuarios["admin@teste.local"]["senha"] == "abc123"
+    assert len(usuarios) == 1

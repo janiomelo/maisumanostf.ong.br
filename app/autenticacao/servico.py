@@ -8,13 +8,16 @@ from app.autorizacao import normalizar_papel
 
 def carregar_usuarios_ambiente() -> dict[str, dict[str, str]]:
     usuarios: dict[str, dict[str, str]] = {}
-    for indice in (1, 2, 3, 4, 5):
-        email = os.getenv(f"AUTH_USER_{indice}_EMAIL", "").strip().lower()
-        senha = os.getenv(f"AUTH_USER_{indice}_PASSWORD", "")
-        papel = os.getenv(f"AUTH_USER_{indice}_PAPEL", "nao_editor")
 
-        if email and senha:
-            usuarios[email] = {"senha": senha, "papel": normalizar_papel(papel)}
+    email_admin = os.getenv("AUTH_USER_ADMIN_EMAIL", "").strip().lower()
+    senha_admin = os.getenv("AUTH_USER_ADMIN_PASSWORD", "")
+    papel_admin = os.getenv("AUTH_USER_ADMIN_PAPEL", "admin")
+
+    if email_admin and senha_admin:
+        usuarios[email_admin] = {
+            "senha": senha_admin,
+            "papel": normalizar_papel(papel_admin),
+        }
 
     return usuarios
 

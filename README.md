@@ -52,9 +52,9 @@ As variáveis da home ficam no `.env`:
 
 Variáveis de autenticação inicial (sessão):
 
-- `AUTH_USER_1_EMAIL`, `AUTH_USER_1_PASSWORD`, `AUTH_USER_1_PAPEL`
-- `AUTH_USER_2_EMAIL`, `AUTH_USER_2_PASSWORD`, `AUTH_USER_2_PAPEL`
-- Até `AUTH_USER_5_*` para novos usuários
+- `AUTH_USER_ADMIN_EMAIL`, `AUTH_USER_ADMIN_PASSWORD`, `AUTH_USER_ADMIN_PAPEL`
+- Esta configuração cria apenas o admin bootstrap no ambiente
+- Outros usuários devem ser criados pela camada de gestão no ambiente real
 
 Após alterar variáveis, rode `make restart`.
 
