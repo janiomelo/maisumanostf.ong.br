@@ -1,6 +1,7 @@
 import pytest
 from sqlalchemy import inspect
 
+import app as app_module
 from app import _normalizar_database_url, create_app, main
 from app.dados.base import db
 from app.dados.modelos import WikiPagina
@@ -29,6 +30,12 @@ def test_factory_registra_blueprints_esperados():
     assert "apoios" in nomes
     assert "defesas" in nomes
     assert "admin" in nomes
+
+
+@pytest.mark.unit
+def test_factory_registra_comando_db_update_seguro():
+    app = create_app({"SQLALCHEMY_DATABASE_URI": "sqlite:///:memory:"})
+    assert "db-update-seguro" in app.cli.commands
 
 
 @pytest.mark.unit
@@ -78,3 +85,21 @@ def test_normalizar_database_url_postgresql_sem_driver():
 def test_normalizar_database_url_preserva_quando_ja_tem_driver():
     raw = "postgresql+psycopg://user:pass@host:5432/dbname"
     assert _normalizar_database_url(raw) == raw
+
+
+@pytest.mark.unit
+def test_factory_aplica_migracoes_automaticas_em_producao(monkeypatch, tmp_path):
+    banco_prod = tmp_path / "prod-migrate.db"
+    monkeypatch.setenv("AMBIENTE_APLICACAO", "producao")
+    monkeypatch.setenv("DATABASE_URL", f"sqlite:///{banco_prod}")
+
+    chamadas: list[str] = []
+
+    def fake_aplicar_migracoes(app, ambiente):
+        chamadas.append(ambiente)
+
+    monkeypatch.setattr(app_module, "_aplicar_migracoes_em_producao", fake_aplicar_migracoes)
+
+    create_app()
+
+    assert chamadas == ["producao"]

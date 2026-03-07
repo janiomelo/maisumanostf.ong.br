@@ -39,6 +39,7 @@ make test-unit
 make test-functional
 make test-e2e
 make test-cov
+make db-update
 make user-create EMAIL=editor@dominio SENHA=trocar PAPEL=editor
 ```
 
@@ -58,6 +59,9 @@ Variáveis de autenticação inicial (sessão):
 - Demais usuários devem ser cadastrados no banco (ex.: `make user-create ...`)
 
 Após alterar variáveis, rode `make restart`.
+
+Em `AMBIENTE_APLICACAO=producao`, a aplicação executa `db upgrade` automaticamente no boot.
+Para bases legadas sem `alembic_version`, use `make db-update` (aplica stamp e upgrade de forma segura).
 
 ## Interfaces públicas
 

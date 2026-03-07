@@ -1,6 +1,6 @@
 SHELL := /bin/bash
 
-.PHONY: up down build logs restart refresh ps shell app-shell init test test-unit test-functional test-e2e test-cov db-init db-migrate db-upgrade db-downgrade user-create
+.PHONY: up down build logs restart refresh ps shell app-shell init test test-unit test-functional test-e2e test-cov db-init db-migrate db-upgrade db-update db-downgrade user-create
 
 up:
 	docker compose up -d --build
@@ -58,6 +58,9 @@ db-migrate:
 
 db-upgrade:
 	docker compose run --rm app flask --app wsgi:app db upgrade
+
+db-update:
+	docker compose run --rm app flask --app wsgi:app db-update-seguro
 
 db-downgrade:
 	docker compose run --rm app flask --app wsgi:app db downgrade
