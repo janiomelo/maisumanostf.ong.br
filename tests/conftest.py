@@ -14,6 +14,10 @@ def app_instance(tmp_path):
         {
             "TESTING": True,
             "SQLALCHEMY_DATABASE_URI": f"sqlite:///{banco_teste}",
+            "AUTH_USUARIOS": {
+                "editor@teste.local": {"senha": "123456", "papel": "editor"},
+                "admin@teste.local": {"senha": "abc123", "papel": "admin"},
+            },
         }
     )
     return app

@@ -13,6 +13,8 @@ def test_create_app_registra_rotas_principais():
     assert "/" in rotas
     assert "/api/contagem-regressiva" in rotas
     assert "/api/countdown" in rotas
+    assert "/entrar" in rotas
+    assert "/sair" in rotas
     assert "/wiki/" in rotas
     assert "/wiki/<slug>" in rotas
     assert "/wiki/<slug>/editar" in rotas
@@ -127,22 +129,32 @@ def test_wiki_estatuto_publico(client):
 
 
 @pytest.mark.functional
-def test_wiki_edicao_exige_papel_editor(client):
+def test_wiki_edicao_exige_autenticacao(client):
     sem_permissao = client.get("/wiki/estatuto-basico-ampliado/editar")
-    assert sem_permissao.status_code == 403
+    assert sem_permissao.status_code == 302
+    assert "/entrar?proximo=/wiki/estatuto-basico-ampliado/editar" in sem_permissao.headers["Location"]
 
-    com_permissao = client.get(
-        "/wiki/estatuto-basico-ampliado/editar",
-        headers={"X-Papel-Usuario": "editor"},
+
+@pytest.mark.functional
+def test_wiki_edicao_exige_papel_editor(client):
+    client.post(
+        "/entrar",
+        data={"email": "editor@teste.local", "senha": "123456"},
     )
+
+    com_permissao = client.get("/wiki/estatuto-basico-ampliado/editar")
     assert com_permissao.status_code == 200
 
 
 @pytest.mark.functional
 def test_wiki_edicao_persistida_no_banco(client):
+    client.post(
+        "/entrar",
+        data={"email": "editor@teste.local", "senha": "123456"},
+    )
+
     response = client.post(
         "/wiki/estatuto-basico-ampliado/editar",
-        headers={"X-Papel-Usuario": "editor"},
         data={
             "titulo": "Estatuto Basico Ampliado (Atualizado)",
             "conteudo_markdown": "# Estatuto Basico Ampliado (Atualizado)\n\nTexto editado via teste.",
@@ -165,20 +177,65 @@ def test_wiki_post_edicao_sem_papel_editor_retorna_403(client):
             "conteudo_markdown": "# Tentativa\n\nSem permissao.",
         },
     )
-    assert response.status_code == 403
+    assert response.status_code == 302
+    assert "/entrar?proximo=/wiki/estatuto-basico-ampliado/editar" in response.headers["Location"]
 
 
 @pytest.mark.functional
 def test_wiki_post_edicao_com_payload_invalido_retorna_400(client):
+    client.post(
+        "/entrar",
+        data={"email": "editor@teste.local", "senha": "123456"},
+    )
+
     response = client.post(
         "/wiki/estatuto-basico-ampliado/editar",
-        headers={"X-Papel-Usuario": "editor"},
         data={
             "titulo": "",
             "conteudo_markdown": "",
         },
     )
     assert response.status_code == 400
+
+
+@pytest.mark.functional
+def test_login_logout_funciona_e_renderiza_estado_no_topo(client):
+    home_anonimo = client.get("/").get_data(as_text=True)
+    assert "Entrar" in home_anonimo
+
+    login = client.post(
+        "/entrar",
+        data={"email": "editor@teste.local", "senha": "123456"},
+        follow_redirects=True,
+    )
+    assert login.status_code == 200
+    html_logado = login.get_data(as_text=True)
+    assert "editor@teste.local (editor)" in html_logado
+
+    logout = client.post("/sair", follow_redirects=True)
+    assert logout.status_code == 200
+    assert "Entrar" in logout.get_data(as_text=True)
+
+
+@pytest.mark.functional
+def test_login_invalido_retorna_401(client):
+    response = client.post(
+        "/entrar",
+        data={"email": "editor@teste.local", "senha": "senha-errada"},
+    )
+    assert response.status_code == 401
+    assert "Credenciais invalidas" in response.get_data(as_text=True)
+
+
+@pytest.mark.functional
+def test_login_ignora_destino_externo(client):
+    response = client.post(
+        "/entrar",
+        data={"email": "editor@teste.local", "senha": "123456", "proximo": "https://externo.com"},
+    )
+
+    assert response.status_code == 302
+    assert response.headers["Location"].endswith("/wiki/")
 
 
 @pytest.mark.functional

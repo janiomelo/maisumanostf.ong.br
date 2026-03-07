@@ -104,6 +104,10 @@ nav a {
   gap: .75rem;
 }
 
+.auth-area form {
+  margin: 0;
+}
+
 .theme-btn {
   border: 1px solid var(--border);
   background: var(--surface);

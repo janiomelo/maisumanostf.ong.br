@@ -18,6 +18,14 @@
         <a href="#transparencia">Transparência</a>
       </nav>
       <div class="auth-area">
+        {% if usuario_esta_logado %}
+          <small>{{ usuario_email }} ({{ papel_atual }})</small>
+          <form method="post" action="{{ url_for('autenticacao.sair') }}">
+            <button class="theme-btn" type="submit">Sair</button>
+          </form>
+        {% else %}
+          <a href="{{ url_for('autenticacao.entrar') }}">Entrar</a>
+        {% endif %}
         <button class="theme-btn" id="themeToggle" type="button">☼</button>
       </div>
     </div>

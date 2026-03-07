@@ -1,16 +1,9 @@
-from flask import Blueprint, abort, g, redirect, render_template, request, url_for
+from flask import Blueprint, abort, redirect, render_template, request, url_for
 
-from app.autorizacao import exigir_permissao, normalizar_papel
+from app.autorizacao import exigir_permissao
 from app.domain.wiki import atualizar_pagina_wiki, carregar_pagina_wiki, listar_paginas_wiki
 
 wiki_bp = Blueprint("wiki", __name__, url_prefix="/wiki")
-
-
-@wiki_bp.before_request
-def carregar_contexto_de_papel() -> None:
-	# Cabecalho temporario para preparar o fluxo de permissao ate entrar autenticacao real.
-	g.papel_atual = normalizar_papel(request.headers.get("X-Papel-Usuario"))
-
 
 @wiki_bp.get("/", strict_slashes=False)
 def indice_wiki():

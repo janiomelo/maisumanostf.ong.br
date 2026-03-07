@@ -24,6 +24,7 @@ def test_factory_registra_blueprints_esperados():
     nomes = sorted(app.blueprints.keys())
 
     assert "main" in nomes
+    assert "autenticacao" in nomes
     assert "wiki" in nomes
     assert "apoios" in nomes
     assert "defesas" in nomes

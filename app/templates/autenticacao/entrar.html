@@ -1,0 +1,29 @@
+{% extends "publico/base.html" %}
+
+{% block title %}Entrar | Mais Uma no STF{% endblock %}
+
+{% block content %}
+<section class="learn-more-box" id="autenticacao-entrar" aria-label="Entrar na plataforma">
+  <h1>Entrar</h1>
+  <p>Acesso para pessoas editoras e administradoras da wiki.</p>
+
+  {% if erro %}
+    <p class="civic-alert"><strong>Erro:</strong> {{ erro }}</p>
+  {% endif %}
+
+  <form method="post" action="{{ url_for('autenticacao.processar_entrada') }}">
+    <input type="hidden" name="proximo" value="{{ proximo }}">
+    <p>
+      <label for="email"><strong>E-mail</strong></label><br>
+      <input id="email" name="email" type="email" autocomplete="username" required style="width:100%;max-width:480px;">
+    </p>
+    <p>
+      <label for="senha"><strong>Senha</strong></label><br>
+      <input id="senha" name="senha" type="password" autocomplete="current-password" required style="width:100%;max-width:480px;">
+    </p>
+    <p>
+      <button class="cta-btn" type="submit">Entrar</button>
+    </p>
+  </form>
+</section>
+{% endblock %}
