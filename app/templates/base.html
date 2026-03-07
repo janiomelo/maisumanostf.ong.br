@@ -20,6 +20,9 @@
       </nav>
       <div class="auth-area">
         {% if usuario_esta_logado %}
+          {% if papel_atual == "admin" %}
+            <a href="{{ url_for('admin.listar_usuarios_admin') }}">Admin usuarios</a>
+          {% endif %}
           <small>{{ usuario_email }} ({{ papel_atual }})</small>
           <form method="post" action="{{ url_for('autenticacao.sair') }}">
             <button class="theme-btn" type="submit">Sair</button>

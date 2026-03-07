@@ -3,8 +3,10 @@ from sqlalchemy.exc import OperationalError
 
 import app.autenticacao.servico as servico_autenticacao
 from app.autenticacao.servico import (
+    atualizar_usuario,
     autenticar,
     bootstrap_admin_por_ambiente,
+    definir_usuario_ativo,
     criar_usuario,
     limpar_sessao_usuario,
     registrar_sessao_usuario,
@@ -111,3 +113,17 @@ def test_registrar_e_limpar_sessao_usuario(app_instance):
         limpar_sessao_usuario()
         assert servico_autenticacao.session.get("usuario_email") is None
         assert servico_autenticacao.session.get("papel_atual") is None
+
+
+@pytest.mark.unit
+def test_atualizar_usuario_inexistente_retorna_erro(app_instance):
+    with app_instance.app_context():
+        with pytest.raises(ValueError, match="Usuario nao encontrado"):
+            atualizar_usuario(usuario_id=9999, papel="editor", senha="")
+
+
+@pytest.mark.unit
+def test_definir_usuario_ativo_inexistente_retorna_erro(app_instance):
+    with app_instance.app_context():
+        with pytest.raises(ValueError, match="Usuario nao encontrado"):
+            definir_usuario_ativo(usuario_id=9999, ativo=False)

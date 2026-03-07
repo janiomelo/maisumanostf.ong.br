@@ -47,6 +47,38 @@ def criar_usuario(email: str, senha: str, papel: str = "nao_editor") -> Usuario:
     return usuario
 
 
+def listar_usuarios() -> list[Usuario]:
+    return Usuario.query.order_by(Usuario.email.asc()).all()
+
+
+def carregar_usuario_por_id(usuario_id: int) -> Usuario | None:
+    return Usuario.query.filter_by(id=usuario_id).first()
+
+
+def atualizar_usuario(usuario_id: int, papel: str, senha: str | None = None) -> Usuario:
+    usuario = carregar_usuario_por_id(usuario_id)
+    if not usuario:
+        raise ValueError("Usuario nao encontrado")
+
+    usuario.papel = normalizar_papel(papel)
+
+    if senha and senha.strip():
+        usuario.definir_senha(senha.strip())
+
+    db.session.commit()
+    return usuario
+
+
+def definir_usuario_ativo(usuario_id: int, ativo: bool) -> Usuario:
+    usuario = carregar_usuario_por_id(usuario_id)
+    if not usuario:
+        raise ValueError("Usuario nao encontrado")
+
+    usuario.ativo = bool(ativo)
+    db.session.commit()
+    return usuario
+
+
 def bootstrap_admin_por_ambiente() -> None:
     email_admin = os.getenv("AUTH_USER_ADMIN_EMAIL", "").strip().lower()
     senha_admin = os.getenv("AUTH_USER_ADMIN_PASSWORD", "")

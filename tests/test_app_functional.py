@@ -3,6 +3,7 @@ import re
 import pytest
 
 from app import create_app
+from app.dados.modelos import Usuario
 
 
 @pytest.mark.functional
@@ -20,6 +21,10 @@ def test_create_app_registra_rotas_principais():
     assert "/wiki/nova" in rotas
     assert "/wiki/<slug>" in rotas
     assert "/wiki/<slug>/editar" in rotas
+    assert "/admin/usuarios" in rotas
+    assert "/admin/usuarios/<int:usuario_id>/atualizar" in rotas
+    assert "/admin/usuarios/<int:usuario_id>/desativar" in rotas
+    assert "/admin/usuarios/<int:usuario_id>/ativar" in rotas
 
 
 @pytest.mark.functional
@@ -316,3 +321,197 @@ def test_login_ignora_destino_externo(client):
 def test_wiki_retorna_404_para_slug_inexistente(client):
     response = client.get("/wiki/pagina-inexistente")
     assert response.status_code == 404
+
+
+@pytest.mark.functional
+def test_admin_usuarios_exige_autenticacao(client):
+    response = client.get("/admin/usuarios")
+    assert response.status_code == 302
+    assert "/entrar?proximo=/admin/usuarios" in response.headers["Location"]
+
+
+@pytest.mark.functional
+def test_admin_usuarios_bloqueia_editor(client):
+    client.post(
+        "/entrar",
+        data={"email": "editor@teste.local", "senha": "123456"},
+    )
+
+    response = client.get("/admin/usuarios")
+    assert response.status_code == 403
+
+
+@pytest.mark.functional
+def test_admin_usuarios_cria_atualiza_e_desativa_usuario(client):
+    client.post(
+        "/entrar",
+        data={"email": "admin@teste.local", "senha": "abc123"},
+    )
+
+    criar = client.post(
+        "/admin/usuarios",
+        data={
+            "email": "novo.usuario@teste.local",
+            "senha": "senha123",
+            "papel": "nao_editor",
+        },
+        follow_redirects=True,
+    )
+    assert criar.status_code == 200
+
+    with client.application.app_context():
+        usuario = Usuario.query.filter_by(email="novo.usuario@teste.local").first()
+        assert usuario is not None
+        usuario_id = usuario.id
+
+    atualizar = client.post(
+        f"/admin/usuarios/{usuario_id}/atualizar",
+        data={"papel": "editor", "senha": ""},
+        follow_redirects=True,
+    )
+    assert atualizar.status_code == 200
+
+    with client.application.app_context():
+        atualizado = Usuario.query.filter_by(id=usuario_id).first()
+        assert atualizado is not None
+        assert atualizado.papel == "editor"
+
+    desativar = client.post(
+        f"/admin/usuarios/{usuario_id}/desativar",
+        follow_redirects=True,
+    )
+    assert desativar.status_code == 200
+
+    with client.application.app_context():
+        desativado = Usuario.query.filter_by(id=usuario_id).first()
+        assert desativado is not None
+        assert desativado.ativo is False
+
+
+@pytest.mark.functional
+def test_admin_usuarios_reativa_usuario(client):
+    client.post(
+        "/entrar",
+        data={"email": "admin@teste.local", "senha": "abc123"},
+    )
+
+    with client.application.app_context():
+        usuario = Usuario.query.filter_by(email="editor@teste.local").first()
+        assert usuario is not None
+        usuario.ativo = False
+        usuario_id = usuario.id
+        from app.dados.base import db
+
+        db.session.commit()
+
+    response = client.post(
+        f"/admin/usuarios/{usuario_id}/ativar",
+        follow_redirects=True,
+    )
+    assert response.status_code == 200
+
+    with client.application.app_context():
+        reativado = Usuario.query.filter_by(id=usuario_id).first()
+        assert reativado is not None
+        assert reativado.ativo is True
+
+
+@pytest.mark.functional
+def test_admin_usuarios_criar_duplicado_retorna_400(client):
+    client.post(
+        "/entrar",
+        data={"email": "admin@teste.local", "senha": "abc123"},
+    )
+
+    response = client.post(
+        "/admin/usuarios",
+        data={
+            "email": "editor@teste.local",
+            "senha": "123456",
+            "papel": "editor",
+        },
+    )
+
+    assert response.status_code == 400
+    assert "Ja existe usuario com esse email" in response.get_data(as_text=True)
+
+
+@pytest.mark.functional
+def test_admin_usuarios_atualizar_inexistente_retorna_404(client):
+    client.post(
+        "/entrar",
+        data={"email": "admin@teste.local", "senha": "abc123"},
+    )
+
+    response = client.post("/admin/usuarios/9999/atualizar", data={"papel": "editor", "senha": ""})
+    assert response.status_code == 404
+
+
+@pytest.mark.functional
+def test_admin_usuarios_desativar_inexistente_retorna_404(client):
+    client.post(
+        "/entrar",
+        data={"email": "admin@teste.local", "senha": "abc123"},
+    )
+
+    response = client.post("/admin/usuarios/9999/desativar")
+    assert response.status_code == 404
+
+
+@pytest.mark.functional
+def test_admin_usuarios_ativar_inexistente_retorna_404(client):
+    client.post(
+        "/entrar",
+        data={"email": "admin@teste.local", "senha": "abc123"},
+    )
+
+    response = client.post("/admin/usuarios/9999/ativar")
+    assert response.status_code == 404
+
+
+@pytest.mark.functional
+def test_admin_usuarios_bloqueia_autodemocao_de_papel(client):
+    client.post(
+        "/entrar",
+        data={"email": "admin@teste.local", "senha": "abc123"},
+    )
+
+    with client.application.app_context():
+        admin = Usuario.query.filter_by(email="admin@teste.local").first()
+        assert admin is not None
+        admin_id = admin.id
+
+    response = client.post(
+        f"/admin/usuarios/{admin_id}/atualizar",
+        data={"papel": "editor", "senha": ""},
+    )
+
+    assert response.status_code == 400
+    assert "Nao e permitido remover seu proprio papel de admin." in response.get_data(as_text=True)
+
+    with client.application.app_context():
+        admin = Usuario.query.filter_by(id=admin_id).first()
+        assert admin is not None
+        assert admin.papel == "admin"
+
+
+@pytest.mark.functional
+def test_admin_usuarios_bloqueia_autodesativacao(client):
+    client.post(
+        "/entrar",
+        data={"email": "admin@teste.local", "senha": "abc123"},
+    )
+
+    with client.application.app_context():
+        admin = Usuario.query.filter_by(email="admin@teste.local").first()
+        assert admin is not None
+        admin_id = admin.id
+
+    response = client.post(f"/admin/usuarios/{admin_id}/desativar")
+    assert response.status_code == 400
+    assert "Nao e permitido desativar seu proprio usuario admin." in response.get_data(as_text=True)
+
+    with client.application.app_context():
+        admin = Usuario.query.filter_by(id=admin_id).first()
+        assert admin is not None
+        assert admin.ativo is True

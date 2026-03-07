@@ -67,6 +67,7 @@ Após alterar variáveis, rode `make restart`.
 - Wiki pública: `/wiki/`
 - Gestão da wiki (autenticada): `/wiki/gestao`
 - Nova página wiki (autenticada): `/wiki/nova`
+- Admin de usuários (apenas admin): `/admin/usuarios`
 - API principal: `/api/contagem-regressiva`
 	- Resposta JSON: `{"alvo": "<ISO datetime>"}`
 - API legada (em transição): `/api/countdown`

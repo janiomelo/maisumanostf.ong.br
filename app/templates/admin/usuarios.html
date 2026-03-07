@@ -1,0 +1,85 @@
+{% extends "publico/base.html" %}
+
+{% block title %}Admin de Usuarios | Mais Uma no STF{% endblock %}
+
+{% block content %}
+<section class="learn-more-box" id="admin-usuarios" aria-label="Gestao interna de usuarios">
+  <h1>Admin de Usuarios</h1>
+  <p>CRUD interno de usuarios e papeis de acesso.</p>
+
+  {% if erro %}
+    <p class="civic-alert"><strong>Erro:</strong> {{ erro }}</p>
+  {% endif %}
+
+  <h2>Criar usuario</h2>
+  <form method="post" action="{{ url_for('admin.criar_usuario_admin') }}">
+    <p>
+      <label for="email"><strong>E-mail</strong></label><br>
+      <input id="email" name="email" type="email" required style="max-width:620px;">
+    </p>
+    <p>
+      <label for="senha"><strong>Senha inicial</strong></label><br>
+      <input id="senha" name="senha" type="password" required style="max-width:620px;">
+    </p>
+    <p>
+      <label for="papel"><strong>Papel</strong></label><br>
+      <select id="papel" name="papel" style="max-width:300px;">
+        {% for papel in papeis_validos %}
+          <option value="{{ papel }}">{{ papel }}</option>
+        {% endfor %}
+      </select>
+    </p>
+    <p>
+      <button class="cta-btn" type="submit">Criar usuario</button>
+    </p>
+  </form>
+
+  <h2>Usuarios cadastrados</h2>
+  <div style="overflow:auto;">
+    <table>
+      <thead>
+        <tr>
+          <th>E-mail</th>
+          <th>Papel</th>
+          <th>Status</th>
+          <th>Acoes</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for usuario in usuarios %}
+          <tr>
+            <td>{{ usuario.email }}</td>
+            <td>
+              <form method="post" action="{{ url_for('admin.atualizar_usuario_admin', usuario_id=usuario.id) }}">
+                <select name="papel">
+                  {% for papel in papeis_validos %}
+                    <option value="{{ papel }}" {% if usuario.papel == papel %}selected{% endif %}>{{ papel }}</option>
+                  {% endfor %}
+                </select>
+                <input name="senha" type="password" placeholder="Nova senha (opcional)">
+                <button class="theme-btn" type="submit">Salvar</button>
+              </form>
+            </td>
+            <td>{% if usuario.ativo %}ativo{% else %}inativo{% endif %}</td>
+            <td>
+              {% if usuario.ativo %}
+                <form method="post" action="{{ url_for('admin.desativar_usuario_admin', usuario_id=usuario.id) }}">
+                  <button class="theme-btn" type="submit">Desativar</button>
+                </form>
+              {% else %}
+                <form method="post" action="{{ url_for('admin.ativar_usuario_admin', usuario_id=usuario.id) }}">
+                  <button class="theme-btn" type="submit">Ativar</button>
+                </form>
+              {% endif %}
+            </td>
+          </tr>
+        {% else %}
+          <tr>
+            <td colspan="4">Nenhum usuario cadastrado.</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+{% endblock %}
