@@ -2,7 +2,7 @@ from datetime import date, datetime
 
 import pytest
 
-from app import main
+from app.domain import campanha as main
 
 
 @pytest.mark.unit
@@ -90,10 +90,10 @@ def test_build_chart_payload_estrutura(monkeypatch):
 @pytest.mark.unit
 def test_build_countdown_target_com_valor_valido(monkeypatch):
     monkeypatch.setenv("COUNTDOWN_TARGET", "2031-01-10T09:00:00-03:00")
-    assert main._build_countdown_target() == "2031-01-10T09:00:00-03:00"
+    assert main.build_countdown_target() == "2031-01-10T09:00:00-03:00"
 
 
 @pytest.mark.unit
 def test_build_countdown_target_com_fallback(monkeypatch):
     monkeypatch.setenv("COUNTDOWN_TARGET", "valor-invalido")
-    assert main._build_countdown_target() == "2028-04-26T00:00:00-03:00"
+    assert main.build_countdown_target() == "2028-04-26T00:00:00-03:00"

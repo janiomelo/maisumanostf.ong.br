@@ -27,6 +27,9 @@ Sequencia aprovada:
 
 Objetivo: organizar o codigo para crescer, sem introduzir funcionalidades novas para usuario final.
 
+Status atual:
+- [x] Atividade 1 executada: base modular com blueprints por dominio e camada `domain` criada, preservando as rotas publicas existentes.
+
 ### Entrega desta fase
 
 - Separacao por dominios com blueprints:
