@@ -6,6 +6,15 @@
 <section class="learn-more-box" id="wiki-indice" aria-label="Indice da Wiki">
   <h1>Wiki da Campanha</h1>
   <p>Espaco de publicacao e organizacao dos conteudos estruturantes do movimento.</p>
+
+  {% if usuario_esta_logado and papel_atual in ["editor", "admin"] %}
+    <p>
+      <a href="{{ url_for('wiki.gestao_wiki') }}">Area de gestao</a>
+      ·
+      <a href="{{ url_for('wiki.nova_pagina_wiki') }}">Nova pagina</a>
+    </p>
+  {% endif %}
+
   <ul class="learn-more-list">
     {% for pagina in paginas %}
       <li>

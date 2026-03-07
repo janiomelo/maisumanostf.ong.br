@@ -16,6 +16,8 @@ def test_create_app_registra_rotas_principais():
     assert "/entrar" in rotas
     assert "/sair" in rotas
     assert "/wiki/" in rotas
+    assert "/wiki/gestao" in rotas
+    assert "/wiki/nova" in rotas
     assert "/wiki/<slug>" in rotas
     assert "/wiki/<slug>/editar" in rotas
 
@@ -196,6 +198,78 @@ def test_wiki_post_edicao_com_payload_invalido_retorna_400(client):
         },
     )
     assert response.status_code == 400
+
+
+@pytest.mark.functional
+def test_wiki_gestao_exige_autenticacao(client):
+    response = client.get("/wiki/gestao")
+    assert response.status_code == 302
+    assert "/entrar?proximo=/wiki/gestao" in response.headers["Location"]
+
+
+@pytest.mark.functional
+def test_wiki_gestao_lista_paginas_para_editor(client):
+    client.post(
+        "/entrar",
+        data={"email": "editor@teste.local", "senha": "123456"},
+    )
+
+    response = client.get("/wiki/gestao")
+    assert response.status_code == 200
+    html = response.get_data(as_text=True)
+    assert "Gestao da Wiki" in html
+    assert "Criar nova pagina" in html
+    assert "Estatuto Basico Ampliado" in html
+
+
+@pytest.mark.functional
+def test_wiki_nova_exige_autenticacao(client):
+    response = client.get("/wiki/nova")
+    assert response.status_code == 302
+    assert "/entrar?proximo=/wiki/nova" in response.headers["Location"]
+
+
+@pytest.mark.functional
+def test_wiki_nova_cria_pagina_com_editor(client):
+    client.post(
+        "/entrar",
+        data={"email": "editor@teste.local", "senha": "123456"},
+    )
+
+    response = client.post(
+        "/wiki/nova",
+        data={
+            "slug": "",
+            "titulo": "Manifesto de Trabalho",
+            "conteudo_markdown": "# Manifesto de Trabalho\n\nTexto inicial da pagina.",
+        },
+        follow_redirects=True,
+    )
+
+    assert response.status_code == 200
+    html = response.get_data(as_text=True)
+    assert "Manifesto de Trabalho" in html
+    assert "Texto inicial da pagina." in html
+
+
+@pytest.mark.functional
+def test_wiki_nova_retorna_400_para_slug_duplicado(client):
+    client.post(
+        "/entrar",
+        data={"email": "editor@teste.local", "senha": "123456"},
+    )
+
+    response = client.post(
+        "/wiki/nova",
+        data={
+            "slug": "estatuto-basico-ampliado",
+            "titulo": "Duplicado",
+            "conteudo_markdown": "# Duplicado\n\nTexto.",
+        },
+    )
+
+    assert response.status_code == 400
+    assert "Ja existe uma pagina com este slug." in response.get_data(as_text=True)
 
 
 @pytest.mark.functional
