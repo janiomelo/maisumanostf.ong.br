@@ -107,11 +107,33 @@ def home():
     return response
 
 
-@main_bp.get("/api/countdown")
-def api_countdown():
+def _build_countdown_target() -> str:
     target_raw = get_setting("COUNTDOWN_TARGET", "2028-04-26T00:00:00-03:00")
     try:
         target_dt = datetime.fromisoformat(target_raw)
     except ValueError:
         target_dt = datetime.fromisoformat("2028-04-26T00:00:00-03:00")
-    return jsonify({"target": target_dt.isoformat()})
+    return target_dt.isoformat()
+
+
+@main_bp.get("/api/contagem-regressiva")
+def api_contagem_regressiva():
+    response = jsonify({"alvo": _build_countdown_target()})
+    response.headers["Content-Language"] = "pt-BR"
+    return response
+
+
+@main_bp.get("/api/countdown")
+def api_countdown_legado():
+    alvo = _build_countdown_target()
+    response = jsonify(
+        {
+            "alvo": alvo,
+            "target": alvo,
+            "aviso": "Use /api/contagem-regressiva; este endpoint legado sera removido.",
+        }
+    )
+    response.headers["Deprecation"] = "true"
+    response.headers["Link"] = '</api/contagem-regressiva>; rel="successor-version"'
+    response.headers["Content-Language"] = "pt-BR"
+    return response

@@ -2,7 +2,7 @@ function startCountdown() {
   const box = document.querySelector('.countdown-box');
   if (!box) return;
 
-  const targetRaw = box.dataset.target;
+  const targetRaw = box.dataset.alvo;
   const target = new Date(targetRaw);
   if (Number.isNaN(target.getTime())) return;
 
