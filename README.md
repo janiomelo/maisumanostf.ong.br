@@ -70,6 +70,8 @@ Este repositório adota `português first` para interfaces públicas e documenta
 
 Regras detalhadas: `docs/politica-idioma.md`.
 
+Planejamento de crescimento: `docs/arquitetura-e-roadmap.md`.
+
 ## Próximas fases
 
 O backlog técnico foi movido para `TODO.md`.
