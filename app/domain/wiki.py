@@ -1,6 +1,6 @@
 import re
 
-from app.dados import WikiPagina
+from app.dados import WikiPagina, db
 
 _SLUG_REGEX = re.compile(r"^[a-z0-9-]+$")
 
@@ -61,3 +61,23 @@ def carregar_pagina_wiki(slug: str) -> dict | None:
         "blocos": blocos,
         "conteudo_markdown": pagina.conteudo_markdown,
     }
+
+
+def atualizar_pagina_wiki(slug: str, titulo: str, conteudo_markdown: str) -> dict | None:
+    if not _is_slug_valido(slug):
+        return None
+
+    pagina = WikiPagina.query.filter_by(slug=slug).first()
+    if not pagina:
+        return None
+
+    titulo_limpo = (titulo or "").strip()
+    conteudo_limpo = (conteudo_markdown or "").strip()
+    if not titulo_limpo or not conteudo_limpo:
+        return None
+
+    pagina.titulo = titulo_limpo
+    pagina.conteudo_markdown = conteudo_limpo
+    db.session.commit()
+
+    return carregar_pagina_wiki(slug)

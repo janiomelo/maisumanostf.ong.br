@@ -139,6 +139,49 @@ def test_wiki_edicao_exige_papel_editor(client):
 
 
 @pytest.mark.functional
+def test_wiki_edicao_persistida_no_banco(client):
+    response = client.post(
+        "/wiki/estatuto-basico-ampliado/editar",
+        headers={"X-Papel-Usuario": "editor"},
+        data={
+            "titulo": "Estatuto Basico Ampliado (Atualizado)",
+            "conteudo_markdown": "# Estatuto Basico Ampliado (Atualizado)\n\nTexto editado via teste.",
+        },
+        follow_redirects=True,
+    )
+
+    assert response.status_code == 200
+    html = response.get_data(as_text=True)
+    assert "Estatuto Basico Ampliado (Atualizado)" in html
+    assert "Texto editado via teste." in html
+
+
+@pytest.mark.functional
+def test_wiki_post_edicao_sem_papel_editor_retorna_403(client):
+    response = client.post(
+        "/wiki/estatuto-basico-ampliado/editar",
+        data={
+            "titulo": "Tentativa sem permissao",
+            "conteudo_markdown": "# Tentativa\n\nSem permissao.",
+        },
+    )
+    assert response.status_code == 403
+
+
+@pytest.mark.functional
+def test_wiki_post_edicao_com_payload_invalido_retorna_400(client):
+    response = client.post(
+        "/wiki/estatuto-basico-ampliado/editar",
+        headers={"X-Papel-Usuario": "editor"},
+        data={
+            "titulo": "",
+            "conteudo_markdown": "",
+        },
+    )
+    assert response.status_code == 400
+
+
+@pytest.mark.functional
 def test_wiki_retorna_404_para_slug_inexistente(client):
     response = client.get("/wiki/pagina-inexistente")
     assert response.status_code == 404
