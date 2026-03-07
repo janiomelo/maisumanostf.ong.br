@@ -1,6 +1,6 @@
 SHELL := /bin/bash
 
-.PHONY: up down build logs restart refresh ps shell app-shell init
+.PHONY: up down build logs restart refresh ps shell app-shell init test test-unit test-functional test-e2e test-cov
 
 up:
 	docker compose up -d --build
@@ -34,3 +34,18 @@ init:
 	mkdir -p data
 	cp -n .env.example .env || true
 	@echo "Ambiente inicializado. Edite .env e rode: make up"
+
+test:
+	docker compose run --rm app pytest
+
+test-unit:
+	docker compose run --rm app pytest -m unit
+
+test-functional:
+	docker compose run --rm app pytest -m functional
+
+test-e2e:
+	docker compose run --rm app pytest -m e2e
+
+test-cov:
+	docker compose run --rm app pytest --cov=app --cov-report=term-missing --cov-report=xml --cov-fail-under=95

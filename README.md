@@ -33,6 +33,11 @@ make logs
 make restart
 make refresh
 make down
+make test
+make test-unit
+make test-functional
+make test-e2e
+make test-cov
 ```
 
 ## Configuração por ambiente
