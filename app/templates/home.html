@@ -1,0 +1,179 @@
+{% extends "base.html" %}
+
+{% block title %}Representatividade Feminina no STF{% endblock %}
+
+{% block content %}
+<section class="hero" id="manifesto">
+  <div class="hero-main">
+    <h1>Representatividade Feminina no STF</h1>
+    <p class="lead">O risco é claro: chegar a zero mulheres no <a href="https://portal.stf.jus.br/" target="_blank" rel="noopener">STF</a> em 2029. A janela de solução é objetiva: a próxima vaga.</p>
+    <p class="civic-alert" role="status" aria-live="polite"><strong>ALERTA CÍVICO:</strong> sem nomeação feminina na próxima vaga, o STF pode ficar sem nenhuma mulher até 2029.</p>
+
+    <ul class="story-points">
+      <li><strong>Diagnóstico:</strong> hoje há apenas 1 ministra em 11 cadeiras do <a href="https://pt.wikipedia.org/wiki/Supremo_Tribunal_Federal" target="_blank" rel="noopener">Supremo Tribunal Federal</a>.</li>
+      <li><strong>Risco:</strong> sem nomeação feminina na próxima vaga, a projeção é de apagão de representatividade.</li>
+      <li><strong>Ação:</strong> pressionar por representatividade como <a href="#sobre">mínimo civilizatório</a>.</li>
+    </ul>
+  </div>
+
+  <aside class="countdown-box" data-target="{{ countdown_target }}">
+    <p class="countdown-kicker">Tempo para garantir o mínimo civilizatório</p>
+    <div class="countdown-grid">
+      <div><strong id="cdDays">0</strong><span>dias</span></div>
+      <div><strong id="cdHours">0</strong><span>horas</span></div>
+      <div><strong id="cdMinutes">0</strong><span>min</span></div>
+      <div><strong id="cdSeconds">0</strong><span>seg</span></div>
+    </div>
+    <p class="countdown-target">Meta atual: 26/04/2028 (Vaga Fux)</p>
+
+    <div class="hero-cta">
+      <a class="cta-btn" href="#participe-section">Participe da campanha</a>
+      <p class="signature-counter">A coleta pública de assinaturas será ativada na próxima fase.</p>
+    </div>
+  </aside>
+</section>
+
+<section class="chart-section" id="dados">
+  <h2>O caminho para o zero ou para o mínimo civilizatório</h2>
+  <p class="chart-summary">A linha cinza mostra o histórico (2000 até hoje). A vermelha pontilhada mostra o risco de extinção em 2029. A verde pontilhada mostra a rota da campanha para retomar o mínimo civilizatório de 2 ministras.</p>
+  <div class="chart-legend-note" aria-hidden="true">
+    <span class="legend-item legend-history">Histórico (2000 até hoje)</span>
+    <span class="legend-item legend-inertia">Risco de extinção (projeção)</span>
+    <span class="legend-item legend-campaign">Campanha Mais Uma (projeção)</span>
+  </div>
+  <div class="chart-canvas-wrap">
+    <canvas id="representationChart" class="risk-chart" aria-label="Gráfico dinâmico de representatividade feminina no STF" role="img"></canvas>
+  </div>
+</section>
+
+<section class="learn-more-box" id="referencias" aria-label="Links para entender o tema">
+  <h2>Para entender melhor</h2>
+  <p>
+    Uma seleção de links para entender melhor o tema da representatividade feminina no STF, 
+    o risco de extinção e a importância de manter um mínimo civilizatório.
+  </p>
+  <ul class="learn-more-list">
+    <li><a href="https://www.jota.info/opiniao-e-analise/colunas/coluna-da-abdf/uma-mulher-para-a-vaga-do-stf" target="_blank" rel="noopener">JOTA — uma mulher para a vaga do STF</a> - <small>02/10/2023</small></li>
+    <li><a href="https://oglobo.globo.com/politica/noticia/2023/11/27/stf-10-x-1-apos-17-anos-corte-deve-voltar-a-ter-apenas-uma-mulher-entre-11-ministros-com-indicacao-de-flavio-dino.ghtml" target="_blank" rel="noopener">O Globo — STF 10 x 1</a> - <small>27/11/2023</small></li>
+    <li><a href="https://www.metropoles.com/brasil/stf-e-stj-terminam-1o-ano-de-governo-lula-com-menos-mulheres-ministras" target="_blank" rel="noopener">Metrópoles — STF e STJ terminam 1º ano de governo Lula com menos mulheres ministras</a> - <small>04/01/2024</small></li>
+    <li><a href="https://www.migalhas.com.br/quentes/450923/em-toda-a-historia-so-36-mulheres-ocuparam-vagas-nas-cortes-do-pais" target="_blank" rel="noopener">Migalhas — Em toda a história, só 36 mulheres ocuparam vagas nas cortes do país</a> - <small>06/03/2026</small></li>
+    <li><a href="https://www.ajufe.org.br/imprensa/ajufe-na-imprensa/16646-nomeacao-de-mulheres-para-o-stf-e-inferior-a-media-de-50-paises-pesquisados" target="_blank" rel="noopener">AJUFE — Nomeação de mulheres para o STF é inferior à média de 50 países pesquisados</a> - <small>08/03/2022</small></li>
+    <li><a href="https://direito.usp.br/noticia/28eb6134409d-por-que-precisamos-de-mais-mulheres-no-supremo-tribunal-federal" target="_blank" rel="noopener">USP — Por que precisamos de mais mulheres no Supremo Tribunal Federal</a> - <small>28/06/2023</small></li>
+  </ul>
+</section>
+
+<section class="wiki" id="sobre">
+  <article>
+    <h2>Sobre o Movimento</h2>
+    <p>
+      A campanha Mais Uma No STF defende um objetivo imediato e objetivo: manter ao menos duas mulheres na Corte,
+      igualando o recorde histórico já alcançado. Nesta fase, esse patamar é tratado como mínimo civilizatório,
+      com base em dados públicos sobre composição do <a href="https://portal.stf.jus.br/" target="_blank" rel="noopener">Tribunal</a>.
+    </p>
+    <p>
+      O foco público é simples: informar, mobilizar e pressionar por uma indicação feminina na próxima vaga.
+    </p>
+  </article>
+
+  <article>
+    <h2>Estatuto Básico</h2>
+    <p>
+      Afim de manter a transparência e a clareza de propósitos, o movimento adota um estatuto básico público, que pode ser resumido em cinco pontos principais:
+    </p>
+    <ul>
+      <li><strong>Finalidade:</strong> promover representatividade mínima feminina no STF.</li>
+      <li><strong>Princípio:</strong> transparência nos dados, fontes e mensagens públicas.</li>
+      <li><strong>Escopo:</strong> atuação cívica, informativa e institucional, sem vínculo partidário.</li>
+      <li><strong>Compromisso:</strong> revisão periódica de dados e correção pública de eventuais erros.</li>
+      <li><strong>Prioridade atual:</strong> campanha “Mais Uma No STF” para retorno ao patamar de 2 ministras ativas.</li>
+    </ul>
+  </article>
+
+  <article>
+    <h2>Cronologia de Ocupação</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Ministra</th>
+          <th>Início</th>
+          <th>Fim</th>
+          <th>Observação</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Ellen Gracie</td>
+          <td>2000</td>
+          <td>2011</td>
+          <td>Primeira mulher no STF, após se aposentar foi substituída pela ministra Rosa Weber.</td>
+        </tr>
+        <tr>
+          <td>Cármen Lúcia</td>
+          <td>2006</td>
+          <td>—</td>
+          <td>Atual ministra.</td>
+        </tr>
+        <tr>
+          <td>Rosa Weber</td>
+          <td>2011</td>
+          <td>2023</td>
+          <td>Terceira mulher no STF e primeira a não ser substituta por outra mulher.</td>
+        </tr>
+      </tbody>
+    </table>
+  </article>
+
+  <article id="vagas">
+    <h2>Próximas Vagas</h2>
+    <ul>
+      <li>Luiz Fux — {{ vacancy_labels.fux }}</li>
+      <li>Cármen Lúcia — {{ vacancy_labels.carmen }}</li>
+      <li>Gilmar Mendes — {{ vacancy_labels.gilmar }}</li>
+    </ul>
+  </article>
+
+  <article id="participe-section">
+    <h2>Participe</h2>
+    <p>
+      A plataforma de assinatura e autenticação ainda não está ativa nesta versão inicial.
+      Nesta fase, o site funciona como base pública de informação e mobilização.
+    </p>
+    <ul>
+      <li>Em breve: assinatura autenticada do manifesto.</li>
+      <li>Em breve: envio de defesas públicas da campanha.</li>
+      <li>Enquanto isso: compartilhe o conteúdo e as referências desta página.</li>
+    </ul>
+  </article>
+
+  <article id="transparencia">
+    <h2>Desenvolvedor e Primeiro Subscritor</h2>
+    <p>
+      Janio Melo, paulistano, líder de produto na Manduá, anticapitalista,
+      internacionalista e entusiasta de agentes de IA na programação.
+    </p>
+    <ul>
+      <li><strong>Site:</strong> <a href="https://janiomelo.dev" target="_blank" rel="noopener">janiomelo.dev</a></li>
+      <li><strong>Bluesky:</strong> <a href="https://bsky.app/profile/janiomelo.dev" target="_blank" rel="noopener">bsky.app/profile/janiomelo.dev</a></li>
+      <li><strong>GitHub:</strong> <a href="https://github.com/janiomelo" target="_blank" rel="noopener">github.com/janiomelo</a></li>
+    </ul>
+  </article>
+
+  <article id="links-relacionados">
+    <h2>Links relacionados e referências</h2>
+    <ul>
+      <li><a href="https://pt.wikipedia.org/wiki/Supremo_Tribunal_Federal" target="_blank" rel="noopener">Wikipédia — Supremo Tribunal Federal</a></li>
+      <li><a href="https://portal.stf.jus.br/" target="_blank" rel="noopener">Portal oficial do STF</a></li>
+      <li><a href="https://www.cnj.jus.br/" target="_blank" rel="noopener">Conselho Nacional de Justiça</a></li>
+      <li><a href="https://www.oab.org.br/" target="_blank" rel="noopener">OAB Nacional</a></li>
+    </ul>
+  </article>
+</section>
+
+{% endblock %}
+
+{% block scripts %}
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
+  <script>
+    window.homeChartPayload = {{ chart_payload | tojson }};
+  </script>
+{% endblock %}
