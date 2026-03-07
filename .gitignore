@@ -37,3 +37,6 @@ htmlcov/
 # Database
 *.db
 *.sqlite3
+*.db-wal
+*.db-shm
+*.db-journal

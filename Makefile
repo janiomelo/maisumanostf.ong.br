@@ -1,6 +1,6 @@
 SHELL := /bin/bash
 
-.PHONY: up down build logs restart refresh ps shell app-shell init test test-unit test-functional test-e2e test-cov
+.PHONY: up down build logs restart refresh ps shell app-shell init test test-unit test-functional test-e2e test-cov db-init db-migrate db-upgrade db-downgrade
 
 up:
 	docker compose up -d --build
@@ -49,3 +49,15 @@ test-e2e:
 
 test-cov:
 	docker compose run --rm app pytest --cov=app --cov-report=term-missing --cov-report=xml --cov-fail-under=95
+
+db-init:
+	docker compose run --rm app flask --app wsgi:app db init
+
+db-migrate:
+	docker compose run --rm app flask --app wsgi:app db migrate -m "$(if $(MSG),$(MSG),schema update)"
+
+db-upgrade:
+	docker compose run --rm app flask --app wsgi:app db upgrade
+
+db-downgrade:
+	docker compose run --rm app flask --app wsgi:app db downgrade
