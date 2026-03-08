@@ -34,6 +34,15 @@
     <div class="hero-cta">
       <a class="cta-btn" href="{{ url_for('apoios.assinar_manifesto') }}">Assinar o manifesto</a>
     </div>
+
+    <section class="sidebar-note" id="vagas" aria-label="Proximas vagas no STF">
+      <h3>Proximas Vagas</h3>
+      <ul>
+        <li>Luiz Fux - {{ vacancy_labels.fux }}</li>
+        <li>Carmen Lucia - {{ vacancy_labels.carmen }}</li>
+        <li>Gilmar Mendes - {{ vacancy_labels.gilmar }}</li>
+      </ul>
+    </section>
   </aside>
 </section>
 
@@ -112,28 +121,6 @@
         </tr>
       </tbody>
     </table>
-  </article>
-
-  <article id="vagas">
-    <h2>Próximas Vagas</h2>
-    <ul>
-      <li>Luiz Fux — {{ vacancy_labels.fux }}</li>
-      <li>Cármen Lúcia — {{ vacancy_labels.carmen }}</li>
-      <li>Gilmar Mendes — {{ vacancy_labels.gilmar }}</li>
-    </ul>
-  </article>
-
-  <article id="transparencia">
-    <h2>Desenvolvedor e Primeiro Subscritor</h2>
-    <p>
-      Janio Melo, paulistano, líder de produto na Manduá, anticapitalista,
-      internacionalista e entusiasta de agentes de IA na programação.
-    </p>
-    <ul>
-      <li><strong>Site:</strong> <a href="https://janiomelo.dev" target="_blank" rel="noopener">janiomelo.dev</a></li>
-      <li><strong>Bluesky:</strong> <a href="https://bsky.app/profile/janiomelo.dev" target="_blank" rel="noopener">bsky.app/profile/janiomelo.dev</a></li>
-      <li><strong>GitHub:</strong> <a href="https://github.com/janiomelo" target="_blank" rel="noopener">github.com/janiomelo</a></li>
-    </ul>
   </article>
 
   <article id="links-relacionados">

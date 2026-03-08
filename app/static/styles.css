@@ -276,6 +276,27 @@ h2 {
   margin-top: .8rem;
 }
 
+.sidebar-note {
+  margin-top: .9rem;
+  border-top: 1px dashed color-mix(in srgb, var(--border) 80%, transparent);
+  padding-top: .7rem;
+  color: var(--muted);
+  font-size: .9rem;
+}
+
+.sidebar-note h3 {
+  margin: 0 0 .3rem;
+  font-size: .95rem;
+  color: var(--text);
+}
+
+.sidebar-note ul {
+  margin: 0;
+  padding-left: 1rem;
+  display: grid;
+  gap: .2rem;
+}
+
 .chart-section {
   margin-top: 2rem;
 }
@@ -497,7 +518,7 @@ button {
 
 .footer-grid {
   display: grid;
-  grid-template-columns: 2fr 1fr 1fr;
+  grid-template-columns: 2fr 2fr 1fr;
   gap: 1rem;
   padding: 1.2rem 0 .8rem;
 }
