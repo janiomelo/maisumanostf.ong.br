@@ -7,7 +7,7 @@ from sqlalchemy.exc import OperationalError
 
 from app import create_app
 from app.dados.base import db
-from app.dados.modelos import ApoioManifesto, Usuario
+from app.dados.modelos import ApoioManifesto, ConfiguracaoPublica, Usuario, WikiPagina
 import app.blueprints.autenticacao.routes as rotas_autenticacao
 import app.blueprints.apoios.routes as rotas_apoios
 import app.blueprints.publico.routes as rotas_publico
@@ -33,6 +33,7 @@ def test_create_app_registra_rotas_principais():
     assert "/wiki/nova" in rotas
     assert "/wiki/<slug>" in rotas
     assert "/wiki/<slug>/editar" in rotas
+    assert "/wiki/<slug>/excluir" in rotas
     assert "/admin" in rotas
     assert "/admin/paginas-gerais" in rotas
     assert "/admin/usuarios" in rotas
@@ -339,6 +340,81 @@ def test_wiki_gestao_lista_paginas_para_editor(client):
     assert '<a href="/wiki/">Wiki</a> / Gestão' in html
     assert "Criar nova página" in html
     assert "Estatuto Basico Ampliado" in html
+    assert 'action="/wiki/estatuto-basico-ampliado/excluir"' in html
+
+
+@pytest.mark.functional
+def test_wiki_exclusao_exige_autenticacao(client):
+    response = client.post("/wiki/estatuto-basico-ampliado/excluir")
+    assert response.status_code == 302
+    assert "/entrar?proximo=/wiki/estatuto-basico-ampliado/excluir" in response.headers["Location"]
+
+
+@pytest.mark.functional
+def test_wiki_exclusao_remove_pagina_e_redireciona_para_gestao(client):
+    client.post(
+        "/entrar",
+        data={"email": "editor@teste.local", "senha": "123456"},
+    )
+
+    with client.application.app_context():
+        db.session.add(
+            WikiPagina(
+                slug="pagina-para-excluir",
+                titulo="Pagina Para Excluir",
+                conteudo_markdown="# Pagina Para Excluir\n\nTexto",
+            )
+        )
+        db.session.commit()
+
+    response = client.post("/wiki/pagina-para-excluir/excluir", follow_redirects=False)
+
+    assert response.status_code == 302
+    assert response.headers["Location"].endswith("/wiki/gestao")
+
+    with client.application.app_context():
+        assert WikiPagina.query.filter_by(slug="pagina-para-excluir").first() is None
+
+
+@pytest.mark.functional
+def test_wiki_exclusao_inexistente_retorna_404(client):
+    client.post(
+        "/entrar",
+        data={"email": "editor@teste.local", "senha": "123456"},
+    )
+
+    response = client.post("/wiki/nao-existe/excluir")
+
+    assert response.status_code == 404
+
+
+@pytest.mark.functional
+def test_wiki_exclusao_em_uso_nas_configuracoes_retorna_400(client):
+    client.post(
+        "/entrar",
+        data={"email": "editor@teste.local", "senha": "123456"},
+    )
+
+    with client.application.app_context():
+        db.session.query(ConfiguracaoPublica).delete()
+        db.session.add(
+            WikiPagina(
+                slug="pagina-em-uso-funcional",
+                titulo="Pagina Em Uso Funcional",
+                conteudo_markdown="# Pagina Em Uso Funcional\n\nTexto",
+            )
+        )
+        db.session.add(ConfiguracaoPublica(chave="wiki_slug_estatuto", valor="pagina-em-uso-funcional"))
+        db.session.commit()
+
+    response = client.post("/wiki/pagina-em-uso-funcional/excluir")
+
+    assert response.status_code == 400
+    html = response.get_data(as_text=True)
+    assert "Não é possível excluir uma página em uso nas configurações públicas." in html
+
+    with client.application.app_context():
+        assert WikiPagina.query.filter_by(slug="pagina-em-uso-funcional").first() is not None
 
 
 @pytest.mark.functional

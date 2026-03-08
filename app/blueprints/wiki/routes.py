@@ -6,6 +6,7 @@ from app.domain.wiki import (
 	carregar_pagina_wiki,
 	criar_pagina_wiki,
 	listar_paginas_wiki,
+	remover_pagina_wiki,
 	slugificar_titulo,
 )
 
@@ -21,7 +22,7 @@ def indice_wiki():
 @exigir_permissao("wiki", "editar")
 def gestao_wiki():
 	paginas = listar_paginas_wiki()
-	return render_template("wiki/gestao.html", paginas=paginas)
+	return render_template("wiki/gestao.html", paginas=paginas, erro=None)
 
 
 @wiki_bp.get("/nova")
@@ -88,3 +89,18 @@ def salvar_pagina_wiki(slug: str):
 		return render_template("wiki/editar-pagina.html", pagina=pagina_atual, erro=erro), 400
 
 	return redirect(url_for("wiki.pagina_wiki", slug=slug))
+
+
+@wiki_bp.post("/<slug>/excluir")
+@exigir_permissao("wiki", "editar")
+def excluir_pagina_wiki(slug: str):
+	try:
+		removido = remover_pagina_wiki(slug)
+	except ValueError as exc:
+		paginas = listar_paginas_wiki()
+		return render_template("wiki/gestao.html", paginas=paginas, erro=str(exc)), 400
+
+	if not removido:
+		abort(404)
+
+	return redirect(url_for("wiki.gestao_wiki"))

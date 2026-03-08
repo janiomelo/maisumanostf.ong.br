@@ -4,8 +4,14 @@ from html import escape
 from urllib.parse import urlparse
 
 from app.dados import WikiPagina, db
+from app.dados.modelos import ConfiguracaoPublica
 
 _SLUG_REGEX = re.compile(r"^[a-z0-9-]+$")
+_CHAVES_WIKI_CONFIGURACAO_PUBLICA = (
+    "wiki_slug_estatuto",
+    "wiki_slug_politica_privacidade",
+    "wiki_slug_termos_uso",
+)
 
 
 def _is_slug_valido(slug: str) -> bool:
@@ -233,3 +239,23 @@ def criar_pagina_wiki(slug: str, titulo: str, conteudo_markdown: str) -> dict:
         raise ValueError("Falha ao carregar página após criação.")
 
     return pagina_dict
+
+
+def remover_pagina_wiki(slug: str) -> bool:
+    if not _is_slug_valido(slug):
+        return False
+
+    em_uso = ConfiguracaoPublica.query.filter(
+        ConfiguracaoPublica.chave.in_(_CHAVES_WIKI_CONFIGURACAO_PUBLICA),
+        ConfiguracaoPublica.valor == slug,
+    ).first()
+    if em_uso:
+        raise ValueError("Não é possível excluir uma página em uso nas configurações públicas.")
+
+    pagina = WikiPagina.query.filter_by(slug=slug).first()
+    if not pagina:
+        return False
+
+    db.session.delete(pagina)
+    db.session.commit()
+    return True

@@ -2,6 +2,7 @@ import pytest
 
 from app.domain import wiki
 from app.dados import WikiPagina, db
+from app.dados.modelos import ConfiguracaoPublica
 
 
 @pytest.mark.unit
@@ -302,3 +303,48 @@ def test_atualizar_pagina_wiki_atualiza_com_sucesso(app_instance):
         assert atualizada is not None
         assert atualizada["titulo"] == "Titulo Novo"
         assert "Texto novo" in atualizada["conteudo_markdown"]
+
+
+@pytest.mark.unit
+def test_remover_pagina_wiki_remove_quando_slug_existe(app_instance):
+    with app_instance.app_context():
+        db.session.add(
+            WikiPagina(
+                slug="remocao-wiki",
+                titulo="Remocao Wiki",
+                conteudo_markdown="# Remocao Wiki\n\nConteudo",
+            )
+        )
+        db.session.commit()
+
+        removido = wiki.remover_pagina_wiki("remocao-wiki")
+
+        assert removido is True
+        assert WikiPagina.query.filter_by(slug="remocao-wiki").first() is None
+
+
+@pytest.mark.unit
+def test_remover_pagina_wiki_retorna_false_para_slug_invalido_ou_inexistente(app_instance):
+    with app_instance.app_context():
+        assert wiki.remover_pagina_wiki("../invalido") is False
+        assert wiki.remover_pagina_wiki("slug-inexistente") is False
+
+
+@pytest.mark.unit
+def test_remover_pagina_wiki_rejeita_quando_em_uso_nas_configuracoes(app_instance):
+    with app_instance.app_context():
+        db.session.query(ConfiguracaoPublica).delete()
+        db.session.add(
+            WikiPagina(
+                slug="pagina-em-uso",
+                titulo="Pagina Em Uso",
+                conteudo_markdown="# Pagina Em Uso\n\nTexto",
+            )
+        )
+        db.session.add(ConfiguracaoPublica(chave="wiki_slug_estatuto", valor="pagina-em-uso"))
+        db.session.commit()
+
+        with pytest.raises(ValueError, match="em uso nas configurações públicas"):
+            wiki.remover_pagina_wiki("pagina-em-uso")
+
+        assert WikiPagina.query.filter_by(slug="pagina-em-uso").first() is not None

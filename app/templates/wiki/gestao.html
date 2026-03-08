@@ -8,6 +8,10 @@
   <h1>Gestão da Wiki</h1>
   <p>Área autenticada para criar e editar páginas da wiki.</p>
 
+  {% if erro %}
+    <p class="civic-alert"><strong>Erro:</strong> {{ erro }}</p>
+  {% endif %}
+
   <p>
     <a class="cta-btn" href="{{ url_for('wiki.nova_pagina_wiki') }}">Criar nova página</a>
   </p>
@@ -19,6 +23,10 @@
         <a href="{{ url_for('wiki.pagina_wiki', slug=pagina.slug) }}">Ver página</a>
         ·
         <a href="{{ url_for('wiki.editar_pagina_wiki', slug=pagina.slug) }}">Editar</a>
+        ·
+        <form method="post" action="{{ url_for('wiki.excluir_pagina_wiki', slug=pagina.slug) }}" style="display:inline;">
+          <button type="submit" class="theme-btn" onclick="return confirm('Tem certeza que deseja excluir esta página da wiki?');">Excluir</button>
+        </form>
       </li>
     {% else %}
       <li>Nenhuma página cadastrada.</li>
