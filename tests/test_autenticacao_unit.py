@@ -1,7 +1,9 @@
 import pytest
 from sqlalchemy.exc import OperationalError
+from flask import Flask
 
 import app.autenticacao.servico as servico_autenticacao
+import app.autenticacao.google_oauth as google_oauth_mod
 from app.autenticacao.servico import (
     BancoIndisponivelError,
     atualizar_usuario,
@@ -15,6 +17,7 @@ from app.autenticacao.servico import (
 )
 from app.dados.modelos import Usuario
 import app.blueprints.autenticacao.routes as rotas_autenticacao
+from app.autenticacao.google_oauth import GoogleOAuthError
 
 
 @pytest.mark.unit
@@ -198,3 +201,242 @@ def test_obter_ou_criar_usuario_google_vincula_usuario_existente_por_email(app_i
         assert usuario.email == "editor.google@teste.local"
         assert usuario.google_sub == "google-sub-link"
         assert usuario.origem_auth == "google"
+
+
+@pytest.mark.functional
+def test_oauth_google_iniciar_retorna_mensagem_amigavel_quando_cliente_nao_inicializa(client, monkeypatch):
+    client.application.config["GOOGLE_OAUTH_ENABLED"] = True
+    client.application.config["GOOGLE_CLIENT_ID"] = "id"
+    client.application.config["GOOGLE_CLIENT_SECRET"] = "secret"
+
+    monkeypatch.setattr(
+        rotas_autenticacao,
+        "obter_cliente_google",
+        lambda: (_ for _ in ()).throw(GoogleOAuthError("falha")),
+    )
+
+    response = client.get("/auth/google/iniciar")
+
+    assert response.status_code == 200
+    assert "Nao foi possivel iniciar o login com Google" in response.get_data(as_text=True)
+
+
+@pytest.mark.functional
+def test_oauth_google_callback_retorna_400_quando_troca_codigo_falha(client, monkeypatch):
+    monkeypatch.setattr(
+        rotas_autenticacao,
+        "trocar_codigo_por_usuario_google",
+        lambda: (_ for _ in ()).throw(GoogleOAuthError("falha")),
+    )
+
+    response = client.get("/auth/google/callback")
+
+    assert response.status_code == 400
+    assert "Falha ao validar login com Google" in response.get_data(as_text=True)
+
+
+@pytest.mark.functional
+def test_oauth_google_callback_retorna_400_quando_google_nao_envia_sub_ou_email(client, monkeypatch):
+    monkeypatch.setattr(
+        rotas_autenticacao,
+        "trocar_codigo_por_usuario_google",
+        lambda: {"sub": "", "email": "", "email_verified": True, "name": "Sem dados"},
+    )
+
+    response = client.get("/auth/google/callback")
+
+    assert response.status_code == 400
+    assert "Dados de autenticacao invalidos retornados pelo Google" in response.get_data(as_text=True)
+
+
+@pytest.mark.unit
+def test_google_oauth_configurado_exige_flags_e_credenciais():
+    assert google_oauth_mod.google_oauth_esta_configurado({}) is False
+    assert (
+        google_oauth_mod.google_oauth_esta_configurado(
+            {
+                "GOOGLE_OAUTH_ENABLED": True,
+                "GOOGLE_CLIENT_ID": "id",
+                "GOOGLE_CLIENT_SECRET": "secret",
+            }
+        )
+        is True
+    )
+
+
+@pytest.mark.unit
+def test_inicializar_google_oauth_nao_registra_cliente_quando_nao_configurado(monkeypatch):
+    app = Flask(__name__)
+    app.config.update(
+        {
+            "GOOGLE_OAUTH_ENABLED": False,
+            "GOOGLE_CLIENT_ID": "",
+            "GOOGLE_CLIENT_SECRET": "",
+            "GOOGLE_DISCOVERY_URL": "https://accounts.google.com/.well-known/openid-configuration",
+        }
+    )
+
+    chamadas = {"init_app": 0, "register": 0}
+
+    monkeypatch.setattr(
+        google_oauth_mod.oauth,
+        "init_app",
+        lambda flask_app: chamadas.__setitem__("init_app", chamadas["init_app"] + 1),
+    )
+    monkeypatch.setattr(
+        google_oauth_mod.oauth,
+        "register",
+        lambda **kwargs: chamadas.__setitem__("register", chamadas["register"] + 1),
+    )
+
+    google_oauth_mod.inicializar_google_oauth(app)
+
+    assert chamadas == {"init_app": 1, "register": 0}
+
+
+@pytest.mark.unit
+def test_inicializar_google_oauth_registra_cliente_quando_configurado(monkeypatch):
+    app = Flask(__name__)
+    app.config.update(
+        {
+            "GOOGLE_OAUTH_ENABLED": True,
+            "GOOGLE_CLIENT_ID": "id",
+            "GOOGLE_CLIENT_SECRET": "secret",
+            "GOOGLE_DISCOVERY_URL": "https://accounts.google.com/.well-known/openid-configuration",
+        }
+    )
+
+    registro = {}
+    monkeypatch.setattr(google_oauth_mod.oauth, "init_app", lambda flask_app: None)
+    monkeypatch.setattr(
+        google_oauth_mod.oauth,
+        "register",
+        lambda **kwargs: registro.update(kwargs),
+    )
+
+    google_oauth_mod.inicializar_google_oauth(app)
+
+    assert registro["name"] == "google"
+    assert registro["client_id"] == "id"
+    assert registro["client_secret"] == "secret"
+    assert registro["server_metadata_url"] == "https://accounts.google.com/.well-known/openid-configuration"
+
+
+@pytest.mark.unit
+def test_obter_cliente_google_dispara_erro_quando_cliente_nao_existe(monkeypatch):
+    monkeypatch.setattr(google_oauth_mod.oauth, "create_client", lambda nome: None)
+
+    with pytest.raises(GoogleOAuthError, match="nao inicializado"):
+        google_oauth_mod.obter_cliente_google()
+
+
+@pytest.mark.unit
+def test_obter_cliente_google_retorna_cliente_quando_disponivel(monkeypatch):
+    cliente_falso = object()
+    monkeypatch.setattr(google_oauth_mod.oauth, "create_client", lambda nome: cliente_falso)
+
+    assert google_oauth_mod.obter_cliente_google() is cliente_falso
+
+
+@pytest.mark.unit
+def test_trocar_codigo_por_usuario_google_retorna_userinfo_do_token(monkeypatch):
+    class ClienteGoogleFalso:
+        @staticmethod
+        def authorize_access_token():
+            return {
+                "userinfo": {
+                    "sub": "sub-1",
+                    "email": "USER@TESTE.LOCAL ",
+                    "email_verified": True,
+                    "name": "  Usuario Teste  ",
+                }
+            }
+
+    monkeypatch.setattr(google_oauth_mod, "obter_cliente_google", lambda: ClienteGoogleFalso())
+
+    dados = google_oauth_mod.trocar_codigo_por_usuario_google()
+
+    assert dados == {
+        "sub": "sub-1",
+        "email": "user@teste.local",
+        "email_verified": True,
+        "name": "Usuario Teste",
+    }
+
+
+@pytest.mark.unit
+def test_trocar_codigo_por_usuario_google_consulta_userinfo_quando_token_sem_campo(monkeypatch):
+    class RespostaJsonFalsa:
+        @staticmethod
+        def json():
+            return {
+                "sub": "sub-2",
+                "email": "via.userinfo@teste.local",
+                "email_verified": False,
+                "name": "Via Userinfo",
+            }
+
+    class ClienteGoogleFalso:
+        @staticmethod
+        def authorize_access_token():
+            return {"access_token": "abc"}
+
+        @staticmethod
+        def userinfo(token=None):
+            assert token == {"access_token": "abc"}
+            return RespostaJsonFalsa()
+
+    monkeypatch.setattr(google_oauth_mod, "obter_cliente_google", lambda: ClienteGoogleFalso())
+
+    dados = google_oauth_mod.trocar_codigo_por_usuario_google()
+
+    assert dados["sub"] == "sub-2"
+    assert dados["email"] == "via.userinfo@teste.local"
+    assert dados["email_verified"] is False
+
+
+@pytest.mark.unit
+def test_trocar_codigo_por_usuario_google_dispara_erro_quando_token_falha(monkeypatch):
+    class ClienteGoogleFalso:
+        @staticmethod
+        def authorize_access_token():
+            raise RuntimeError("falha token")
+
+    monkeypatch.setattr(google_oauth_mod, "obter_cliente_google", lambda: ClienteGoogleFalso())
+
+    with pytest.raises(GoogleOAuthError, match="token de acesso"):
+        google_oauth_mod.trocar_codigo_por_usuario_google()
+
+
+@pytest.mark.unit
+def test_trocar_codigo_por_usuario_google_dispara_erro_quando_userinfo_falha(monkeypatch):
+    class ClienteGoogleFalso:
+        @staticmethod
+        def authorize_access_token():
+            return "token-simples"
+
+        @staticmethod
+        def userinfo(token=None):
+            raise RuntimeError("falha userinfo")
+
+    monkeypatch.setattr(google_oauth_mod, "obter_cliente_google", lambda: ClienteGoogleFalso())
+
+    with pytest.raises(GoogleOAuthError, match="consultar perfil"):
+        google_oauth_mod.trocar_codigo_por_usuario_google()
+
+
+@pytest.mark.unit
+def test_trocar_codigo_por_usuario_google_dispara_erro_quando_resposta_final_invalida(monkeypatch):
+    class ClienteGoogleFalso:
+        @staticmethod
+        def authorize_access_token():
+            return {"access_token": "abc"}
+
+        @staticmethod
+        def userinfo(token=None):
+            return "nao-dict"
+
+    monkeypatch.setattr(google_oauth_mod, "obter_cliente_google", lambda: ClienteGoogleFalso())
+
+    with pytest.raises(GoogleOAuthError, match="Resposta invalida"):
+        google_oauth_mod.trocar_codigo_por_usuario_google()
