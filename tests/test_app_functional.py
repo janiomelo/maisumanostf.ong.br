@@ -19,6 +19,7 @@ def test_create_app_registra_rotas_principais():
     assert "/entrar" in rotas
     assert "/auth/google/iniciar" in rotas
     assert "/auth/google/callback" in rotas
+    assert "/conta/remover" in rotas
     assert "/sair" in rotas
     assert "/wiki/" in rotas
     assert "/wiki/gestao" in rotas
@@ -629,6 +630,34 @@ def test_apoios_remover_apaga_registro_existente(client):
 
     with client.application.app_context():
         assinatura = ApoioManifesto.query.filter_by(email="editor@teste.local").first()
+        assert assinatura is None
+
+
+@pytest.mark.functional
+def test_remover_conta_exige_login(client):
+    response = client.post("/conta/remover")
+
+    assert response.status_code == 302
+    assert response.headers["Location"].endswith("/entrar")
+
+
+@pytest.mark.functional
+def test_remover_conta_apaga_usuario_e_apoio(client):
+    client.post(
+        "/entrar",
+        data={"email": "editor@teste.local", "senha": "123456"},
+    )
+    client.post("/apoios/assinar", data={"nome": "Editora Teste"})
+
+    response = client.post("/conta/remover", follow_redirects=True)
+
+    assert response.status_code == 200
+    assert "Entrar" in response.get_data(as_text=True)
+
+    with client.application.app_context():
+        usuario = Usuario.query.filter_by(email="editor@teste.local").first()
+        assinatura = ApoioManifesto.query.filter_by(email="editor@teste.local").first()
+        assert usuario is None
         assert assinatura is None
 
 

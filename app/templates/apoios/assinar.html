@@ -56,5 +56,11 @@
       <button class="theme-btn" type="submit">Remover apoio</button>
     </form>
   {% endif %}
+
+  <hr class="login-divider">
+  <p>Se preferir, você também pode remover sua conta e todos os dados vinculados a ela.</p>
+  <form method="post" action="{{ url_for('autenticacao.remover_conta') }}">
+    <button class="theme-btn" type="submit">Remover conta</button>
+  </form>
 </section>
 {% endblock %}

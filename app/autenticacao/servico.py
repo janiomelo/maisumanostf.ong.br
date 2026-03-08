@@ -7,7 +7,7 @@ from flask import session
 
 from app.autorizacao import normalizar_papel
 from app.dados.base import db
-from app.dados.modelos import Usuario
+from app.dados.modelos import ApoioManifesto, Usuario
 
 
 class BancoIndisponivelError(RuntimeError):
@@ -159,3 +159,21 @@ def obter_ou_criar_usuario_google(sub: str, email: str, email_verificado: bool) 
     db.session.add(usuario)
     db.session.commit()
     return usuario
+
+
+def remover_conta_usuario(email: str) -> bool:
+    email_normalizado = email.strip().lower()
+    if not email_normalizado:
+        return False
+
+    usuario = Usuario.query.filter_by(email=email_normalizado).first()
+    if not usuario:
+        return False
+
+    apoio = ApoioManifesto.query.filter_by(email=email_normalizado).first()
+    if apoio:
+        db.session.delete(apoio)
+
+    db.session.delete(usuario)
+    db.session.commit()
+    return True

@@ -8,6 +8,7 @@ from app.autenticacao import (
     limpar_sessao_usuario,
     obter_cliente_google,
     obter_ou_criar_usuario_google,
+    remover_conta_usuario,
     registrar_sessao_usuario,
     trocar_codigo_por_usuario_google,
 )
@@ -112,6 +113,17 @@ def callback_oauth_google():
 
 @autenticacao_bp.post("/sair")
 def sair():
+    limpar_sessao_usuario()
+    return redirect(url_for("main.home"))
+
+
+@autenticacao_bp.post("/conta/remover")
+def remover_conta():
+    email = str(getattr(g, "usuario_email", "") or "").strip().lower()
+    if not email:
+        return redirect(url_for("autenticacao.entrar"))
+
+    remover_conta_usuario(email)
     limpar_sessao_usuario()
     return redirect(url_for("main.home"))
 

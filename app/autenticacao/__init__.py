@@ -9,6 +9,7 @@ from .servico import (
     limpar_sessao_usuario,
     listar_usuarios,
     obter_ou_criar_usuario_google,
+    remover_conta_usuario,
     registrar_sessao_usuario,
 )
 from .google_oauth import (
@@ -29,6 +30,7 @@ __all__ = [
     "limpar_sessao_usuario",
     "listar_usuarios",
     "obter_ou_criar_usuario_google",
+    "remover_conta_usuario",
     "registrar_sessao_usuario",
     "GoogleOAuthError",
     "google_oauth_esta_configurado",
