@@ -188,6 +188,15 @@ h2 {
 
 .lead { color: var(--text); }
 
+.manifesto-kicker {
+  margin: 0 0 .2rem;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  font-size: .78rem;
+  color: var(--muted);
+  font-weight: 700;
+}
+
 .civic-alert {
   margin: .8rem 0 0;
   padding: .65rem .8rem;
@@ -234,6 +243,33 @@ h2 {
 .timeline-inline table {
   min-width: 640px;
   font-size: .94rem;
+}
+
+.manifesto-resumo {
+  margin: .85rem 0 1rem;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--surface) 88%, var(--bg));
+  padding: .8rem .9rem;
+}
+
+.manifesto-resumo h2 {
+  margin: 0 0 .35rem;
+  font-size: 1.1rem;
+}
+
+.manifesto-resumo ol {
+  margin: 0;
+  padding-left: 1.1rem;
+  display: grid;
+  gap: .35rem;
+}
+
+.manifesto-resumo ul {
+  margin: 0;
+  padding-left: 1.1rem;
+  display: grid;
+  gap: .35rem;
 }
 
 .learn-more-box {
@@ -302,6 +338,13 @@ h2 {
 
 .hero-cta {
   margin-top: .8rem;
+}
+
+.cta-help {
+  margin: .45rem 0 0;
+  color: var(--muted);
+  font-size: .9rem;
+  max-width: 34ch;
 }
 
 .sidebar-note {

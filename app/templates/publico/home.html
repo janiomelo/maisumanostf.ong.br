@@ -5,8 +5,9 @@
 {% block content %}
 <section class="hero" id="manifesto">
   <div class="hero-main">
+    <p class="manifesto-kicker">Manifesto em quatro atos</p>
     <h1>Representatividade Feminina no STF</h1>
-    <p class="lead">O risco é claro: chegar a zero mulheres no <a href="https://portal.stf.jus.br/" target="_blank" rel="noopener">STF</a> em 2029. A janela de solução é objetiva: a próxima vaga.</p>
+    <p class="lead">Este site conta uma história objetiva: onde estamos, qual risco corremos e qual compromisso minimo precisamos exigir na proxima vaga do <a href="https://portal.stf.jus.br/" target="_blank" rel="noopener">STF</a>.</p>
     <p class="civic-alert" role="status" aria-live="polite"><strong>ALERTA CÍVICO:</strong> sem nomeação feminina na próxima vaga, o STF pode ficar sem nenhuma mulher até 2029.</p>
 
     <ul class="story-points">
@@ -16,7 +17,7 @@
     </ul>
 
     <section class="timeline-inline" aria-label="Cronologia de ocupacao">
-      <h2>Cronologia de Ocupação</h2>
+      <h2>Ato 1: de onde vem o risco</h2>
       <p class="timeline-summary">Resumo histórico de presença feminina no STF para contextualizar o risco atual.</p>
       <div class="timeline-table-wrap">
         <table>
@@ -70,7 +71,8 @@
     <p class="countdown-target">Meta atual: 26/04/2028 (Vaga Fux)</p>
 
     <div class="hero-cta">
-      <a class="cta-btn" href="{{ url_for('apoios.assinar_manifesto') }}">Assinar o manifesto</a>
+      <a class="cta-btn" href="{{ url_for('apoios.assinar_manifesto') }}">Assinar e registrar apoio publico</a>
+      <p class="cta-help">Assinatura unica por conta. Leva menos de 1 minuto e fortalece a pressao publica.</p>
     </div>
 
     <section class="sidebar-note" id="vagas" aria-label="Proximas vagas no STF">
@@ -85,7 +87,7 @@
 </section>
 
 <section class="chart-section" id="dados">
-  <h2>O caminho para o zero ou para o mínimo civilizatório</h2>
+  <h2>Ato 2: o que acontece sem reação publica</h2>
   <p class="chart-summary">A linha cinza mostra o histórico (2000 até hoje). A vermelha pontilhada mostra o risco de extinção em 2029. A verde pontilhada mostra a rota da campanha para retomar o mínimo civilizatório de 2 ministras.</p>
   <div class="chart-legend-note" aria-hidden="true">
     <span class="legend-item legend-history">Histórico (2000 até hoje)</span>
@@ -98,10 +100,9 @@
 </section>
 
 <section class="learn-more-box" id="referencias" aria-label="Links para entender o tema">
-  <h2>Para entender melhor</h2>
+  <h2>Ato 3: evidencias publicas</h2>
   <p>
-    Uma seleção de links para entender melhor o tema da representatividade feminina no STF, 
-    o risco de extinção e a importância de manter um mínimo civilizatório.
+    Fontes jornalisticas e institucionais que sustentam o diagnostico e o chamado do manifesto.
   </p>
   <ul class="learn-more-list">
     <li><a href="https://www.jota.info/opiniao-e-analise/colunas/coluna-da-abdf/uma-mulher-para-a-vaga-do-stf" target="_blank" rel="noopener">JOTA — uma mulher para a vaga do STF</a> - <small>02/10/2023</small></li>
@@ -115,7 +116,7 @@
 
 <section class="wiki" id="sobre">
   <article>
-    <h2>Sobre o Movimento</h2>
+    <h2>Ato 4: compromisso minimo da campanha</h2>
     <p>
       A campanha Mais Uma No STF defende um objetivo imediato e objetivo: manter ao menos duas mulheres na Corte,
       igualando o recorde histórico já alcançado. Nesta fase, esse patamar é tratado como mínimo civilizatório,
@@ -123,17 +124,8 @@
     </p>
     <p>
       O foco público é simples: informar, mobilizar e pressionar por uma indicação feminina na próxima vaga.
+      Se voce concorda com esse compromisso minimo, o proximo passo e registrar apoio em <a href="{{ url_for('apoios.assinar_manifesto') }}">/apoios/assinar</a>.
     </p>
-  </article>
-
-  <article id="links-relacionados">
-    <h2>Links relacionados e referências</h2>
-    <ul>
-      <li><a href="https://pt.wikipedia.org/wiki/Supremo_Tribunal_Federal" target="_blank" rel="noopener">Wikipédia — Supremo Tribunal Federal</a></li>
-      <li><a href="https://portal.stf.jus.br/" target="_blank" rel="noopener">Portal oficial do STF</a></li>
-      <li><a href="https://www.cnj.jus.br/" target="_blank" rel="noopener">Conselho Nacional de Justiça</a></li>
-      <li><a href="https://www.oab.org.br/" target="_blank" rel="noopener">OAB Nacional</a></li>
-    </ul>
   </article>
 </section>
 

@@ -529,6 +529,10 @@ def test_apoios_assinar_renderiza_form_para_usuario_logado(client):
     assert response.status_code == 200
     html = response.get_data(as_text=True)
     assert "Assinar o Manifesto" in html
+    assert "Resumo em 3 pontos" in html
+    assert "transformar diagnostico em apoio publico verificavel" in html
+    assert "Depois da assinatura" in html
+    assert "Seu apoio fica registrado de forma unica" in html
     assert '<form method="post" action="/apoios/assinar">' in html
 
 
