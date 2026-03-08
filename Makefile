@@ -67,3 +67,6 @@ db-downgrade:
 
 user-create:
 	docker compose run --rm app flask --app wsgi:app criar-usuario --email "$(EMAIL)" --senha "$(SENHA)" --papel "$(if $(PAPEL),$(PAPEL),editor)"
+
+pip-freeze:
+	docker compose run --rm app pip freeze > requirements.txt
