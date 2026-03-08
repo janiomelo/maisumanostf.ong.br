@@ -13,6 +13,7 @@
   --chart-annotation-bg: rgba(255, 255, 255, .96);
   --chart-annotation-border: rgba(120, 130, 145, .55);
   --chart-annotation-text: #1a1a1a;
+  --texto-simples-size: 1rem;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -233,7 +234,7 @@ h2 {
 .timeline-summary {
   margin: 0 0 .55rem;
   color: var(--muted);
-  font-size: .92rem;
+  font-size: var(--texto-simples-size);
 }
 
 .timeline-table-wrap {
@@ -286,7 +287,7 @@ h2 {
 .learn-more-box p {
   margin-top: 0;
   color: var(--text);
-  font-size: .95rem;
+  font-size: var(--texto-simples-size);
 }
 
 .learn-more-list {
@@ -333,7 +334,7 @@ h2 {
 
 .countdown-target {
   color: var(--text);
-  font-size: .95rem;
+  font-size: var(--texto-simples-size);
 }
 
 .hero-cta {
@@ -343,7 +344,7 @@ h2 {
 .cta-help {
   margin: .45rem 0 0;
   color: var(--muted);
-  font-size: .9rem;
+  font-size: var(--texto-simples-size);
   max-width: 34ch;
 }
 
@@ -352,12 +353,12 @@ h2 {
   border-top: 1px dashed color-mix(in srgb, var(--border) 80%, transparent);
   padding-top: .7rem;
   color: var(--muted);
-  font-size: .9rem;
+  font-size: var(--texto-simples-size);
 }
 
 .sidebar-note h3 {
   margin: 0 0 .3rem;
-  font-size: .95rem;
+  font-size: var(--texto-simples-size);
   color: var(--text);
 }
 
@@ -375,6 +376,7 @@ h2 {
 .chart-summary {
   margin-top: -.2rem;
   color: var(--text);
+  font-size: var(--texto-simples-size);
 }
 
 .chart-legend-note {
