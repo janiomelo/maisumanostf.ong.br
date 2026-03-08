@@ -43,6 +43,8 @@ def test_carregar_pagina_wiki_retorna_blocos_do_banco(app_instance):
         assert any(bloco["tipo"] == "h2" and bloco["texto"] == "Secao" for bloco in pagina["blocos"])
         assert "<h2>Secao</h2>" in pagina["conteudo_html"]
         assert "conteudo_markdown" in pagina
+        assert "criado_em" in pagina
+        assert "atualizado_em" in pagina
 
 
 @pytest.mark.unit

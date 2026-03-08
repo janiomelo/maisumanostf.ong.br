@@ -177,6 +177,8 @@ def carregar_pagina_wiki(slug: str) -> dict | None:
         "blocos": blocos,
         "conteudo_html": _render_markdown_html(pagina.conteudo_markdown),
         "conteudo_markdown": pagina.conteudo_markdown,
+        "criado_em": pagina.criado_em,
+        "atualizado_em": pagina.atualizado_em,
     }
 
 

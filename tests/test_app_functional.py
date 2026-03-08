@@ -197,6 +197,8 @@ def test_wiki_estatuto_publico(client):
     assert "Escopo inicial" in html
     assert "<ul>" in html
     assert '<a href="/wiki/">Wiki</a> /' in html
+    assert "Criado em:" in html
+    assert "Autor: Editorial da campanha Mais Uma no STF" not in html
 
 
 @pytest.mark.functional
