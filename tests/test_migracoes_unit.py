@@ -88,7 +88,10 @@ def test_historico_migracao_presente_quando_alembic_tem_registro(app_instance, m
         def connect():
             return ConnFalsa()
 
-    monkeypatch.setattr(migracoes.db, "engine", EngineFalso())
+    class DbFalso:
+        engine = EngineFalso()
+
+    monkeypatch.setattr(migracoes, "db", DbFalso())
 
     with app_instance.app_context():
         assert migracoes._historico_migracao_presente({"alembic_version"}) is True
