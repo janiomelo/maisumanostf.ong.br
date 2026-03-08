@@ -38,7 +38,7 @@ def _parse_conteudo_markdown(raw: str) -> tuple[str, list[dict[str, str]]]:
         blocos.append({"tipo": "p", "texto": linha.strip()})
 
     if not titulo:
-        titulo = "Pagina Wiki"
+        titulo = "Página Wiki"
 
     return titulo, blocos
 
@@ -98,17 +98,17 @@ def criar_pagina_wiki(slug: str, titulo: str, conteudo_markdown: str) -> dict:
     conteudo_limpo = (conteudo_markdown or "").strip()
 
     if not titulo_limpo or not conteudo_limpo:
-        raise ValueError("Titulo e conteudo sao obrigatorios para criar a pagina.")
+        raise ValueError("Título e conteúdo são obrigatórios para criar a página.")
 
     if not slug_limpo:
         slug_limpo = slugificar_titulo(titulo_limpo)
 
     if not _is_slug_valido(slug_limpo):
-        raise ValueError("Slug invalido. Use apenas letras minusculas, numeros e hifen.")
+        raise ValueError("Slug inválido. Use apenas letras minúsculas, números e hífen.")
 
     existe = WikiPagina.query.filter_by(slug=slug_limpo).first()
     if existe:
-        raise ValueError("Ja existe uma pagina com este slug.")
+        raise ValueError("Já existe uma página com este slug.")
 
     pagina = WikiPagina(
         slug=slug_limpo,
@@ -120,6 +120,6 @@ def criar_pagina_wiki(slug: str, titulo: str, conteudo_markdown: str) -> dict:
 
     pagina_dict = carregar_pagina_wiki(slug_limpo)
     if not pagina_dict:
-        raise ValueError("Falha ao carregar pagina apos criacao.")
+        raise ValueError("Falha ao carregar página após criação.")
 
     return pagina_dict

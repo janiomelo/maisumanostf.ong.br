@@ -23,7 +23,7 @@ def autenticar(email: str, senha: str) -> dict[str, str] | None:
         usuario = Usuario.query.filter_by(email=email_normalizado, ativo=True).first()
     except OperationalError as exc:
         db.session.rollback()
-        raise BancoIndisponivelError("Falha temporaria de conexao com banco.") from exc
+        raise BancoIndisponivelError("Falha temporária de conexão com banco.") from exc
 
     if not usuario or not usuario.validar_senha(senha):
         return None
@@ -37,14 +37,14 @@ def autenticar(email: str, senha: str) -> dict[str, str] | None:
 def criar_usuario(email: str, senha: str, papel: str = "nao_editor") -> Usuario:
     email_normalizado = email.strip().lower()
     if not email_normalizado:
-        raise ValueError("Email e obrigatorio")
+        raise ValueError("E-mail é obrigatório")
 
     if not senha:
-        raise ValueError("Senha e obrigatoria")
+        raise ValueError("Senha é obrigatória")
 
     existe = Usuario.query.filter_by(email=email_normalizado).first()
     if existe:
-        raise ValueError("Ja existe usuario com esse email")
+        raise ValueError("Já existe usuário com esse e-mail")
 
     usuario = Usuario(
         email=email_normalizado,
@@ -68,7 +68,7 @@ def carregar_usuario_por_id(usuario_id: int) -> Usuario | None:
 def atualizar_usuario(usuario_id: int, papel: str, senha: str | None = None) -> Usuario:
     usuario = carregar_usuario_por_id(usuario_id)
     if not usuario:
-        raise ValueError("Usuario nao encontrado")
+        raise ValueError("Usuário não encontrado")
 
     usuario.papel = normalizar_papel(papel)
 
@@ -82,7 +82,7 @@ def atualizar_usuario(usuario_id: int, papel: str, senha: str | None = None) -> 
 def definir_usuario_ativo(usuario_id: int, ativo: bool) -> Usuario:
     usuario = carregar_usuario_por_id(usuario_id)
     if not usuario:
-        raise ValueError("Usuario nao encontrado")
+        raise ValueError("Usuário não encontrado")
 
     usuario.ativo = bool(ativo)
     db.session.commit()
@@ -127,7 +127,7 @@ def obter_ou_criar_usuario_google(sub: str, email: str, email_verificado: bool) 
     email_normalizado = email.strip().lower()
 
     if not sub_normalizado or not email_normalizado:
-        raise ValueError("Dados invalidos do Google para autenticacao")
+        raise ValueError("Dados inválidos do Google para autenticação")
 
     usuario = Usuario.query.filter_by(google_sub=sub_normalizado).first()
     if usuario:

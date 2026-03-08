@@ -58,7 +58,7 @@ def atualizar_usuario_admin(usuario_id: int):
 	if usuario.email == getattr(g, "usuario_email", None) and usuario.papel != "admin":
 		atualizar_usuario(usuario_id=usuario_id, papel="admin", senha="")
 		usuarios = listar_usuarios()
-		erro = "Nao e permitido remover seu proprio papel de admin."
+		erro = "Não é permitido remover seu próprio papel de admin."
 		return render_template(
 			"admin/usuarios.html",
 			usuarios=usuarios,
@@ -80,7 +80,7 @@ def desativar_usuario_admin(usuario_id: int):
 	if usuario.email == getattr(g, "usuario_email", None):
 		definir_usuario_ativo(usuario_id=usuario_id, ativo=True)
 		usuarios = listar_usuarios()
-		erro = "Nao e permitido desativar seu proprio usuario admin."
+		erro = "Não é permitido desativar seu próprio usuário admin."
 		return render_template(
 			"admin/usuarios.html",
 			usuarios=usuarios,

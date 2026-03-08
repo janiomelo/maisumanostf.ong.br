@@ -72,7 +72,7 @@ def test_criar_pagina_wiki_com_slug_automatico(app_instance):
 @pytest.mark.unit
 def test_criar_pagina_wiki_rejeita_slug_duplicado(app_instance):
     with app_instance.app_context():
-        with pytest.raises(ValueError, match="Ja existe uma pagina com este slug"):
+        with pytest.raises(ValueError, match="Já existe uma página com este slug"):
             wiki.criar_pagina_wiki(
                 slug="estatuto-basico-ampliado",
                 titulo="Outro Estatuto",
@@ -83,10 +83,10 @@ def test_criar_pagina_wiki_rejeita_slug_duplicado(app_instance):
 @pytest.mark.unit
 def test_criar_pagina_wiki_rejeita_payload_invalido(app_instance):
     with app_instance.app_context():
-        with pytest.raises(ValueError, match="Titulo e conteudo sao obrigatorios"):
+        with pytest.raises(ValueError, match="Título e conteúdo são obrigatórios"):
             wiki.criar_pagina_wiki(slug="nova", titulo="", conteudo_markdown="")
 
-        with pytest.raises(ValueError, match="Slug invalido"):
+        with pytest.raises(ValueError, match="Slug inválido"):
             wiki.criar_pagina_wiki(
                 slug="../invalido",
                 titulo="Titulo valido",

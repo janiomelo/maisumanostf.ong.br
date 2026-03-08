@@ -226,8 +226,8 @@ def test_wiki_gestao_lista_paginas_para_editor(client):
     response = client.get("/wiki/gestao")
     assert response.status_code == 200
     html = response.get_data(as_text=True)
-    assert "Gestao da Wiki" in html
-    assert "Criar nova pagina" in html
+    assert "Gestão da Wiki" in html
+    assert "Criar nova página" in html
     assert "Estatuto Basico Ampliado" in html
 
 
@@ -251,7 +251,7 @@ def test_wiki_nova_nao_usa_required_no_textarea_com_easymde(client):
     html = response.get_data(as_text=True)
     assert '<textarea id="conteudo_markdown" name="conteudo_markdown" rows="16">' in html
     assert 'name="conteudo_markdown" rows="16" required' not in html
-    assert "alert('Conteudo e obrigatorio.')" in html
+    assert "alert('Conteúdo é obrigatório.')" in html
 
 
 @pytest.mark.functional
@@ -308,7 +308,7 @@ def test_wiki_nova_retorna_400_para_slug_duplicado(client):
     )
 
     assert response.status_code == 400
-    assert "Ja existe uma pagina com este slug." in response.get_data(as_text=True)
+    assert "Já existe uma página com este slug." in response.get_data(as_text=True)
 
 
 @pytest.mark.functional
@@ -324,7 +324,7 @@ def test_wiki_editar_nao_usa_required_no_textarea_com_easymde(client):
     html = response.get_data(as_text=True)
     assert '<textarea id="conteudo_markdown" name="conteudo_markdown" rows="16">' in html
     assert 'name="conteudo_markdown" rows="16" required' not in html
-    assert "alert('Conteudo e obrigatorio.')" in html
+    assert "alert('Conteúdo é obrigatório.')" in html
 
 
 @pytest.mark.functional
@@ -367,7 +367,7 @@ def test_login_invalido_retorna_401(client):
         data={"email": "editor@teste.local", "senha": "senha-errada"},
     )
     assert response.status_code == 401
-    assert "Credenciais invalidas" in response.get_data(as_text=True)
+    assert "Credenciais inválidas" in response.get_data(as_text=True)
 
 
 @pytest.mark.functional
@@ -389,7 +389,7 @@ def test_login_mostra_botao_google_quando_habilitado(client):
     html = response.get_data(as_text=True)
     assert "Entrar com Google" in html
     assert "Continuar com Google" in html
-    assert "Usar e-mail e senha (secundario)" in html
+    assert "Usar e-mail e senha (secundário)" in html
 
 
 @pytest.mark.functional
@@ -399,7 +399,7 @@ def test_oauth_google_iniciar_retorna_503_quando_desabilitado(client):
     response = client.get("/auth/google/iniciar")
 
     assert response.status_code == 200
-    assert "Login com Google indisponivel" in response.get_data(as_text=True)
+    assert "Login com Google indisponível" in response.get_data(as_text=True)
 
 
 @pytest.mark.functional
@@ -495,7 +495,7 @@ def test_oauth_google_callback_retorna_mensagem_amigavel_quando_falha_persistenc
     response = client.get("/auth/google/callback")
 
     assert response.status_code == 400
-    assert "Nao foi possivel concluir o login com Google agora" in response.get_data(as_text=True)
+    assert "Não foi possível concluir o login com Google agora" in response.get_data(as_text=True)
 
 
 @pytest.mark.functional
@@ -530,9 +530,9 @@ def test_apoios_assinar_renderiza_form_para_usuario_logado(client):
     html = response.get_data(as_text=True)
     assert "Assinar o Manifesto" in html
     assert "Resumo em 3 pontos" in html
-    assert "transformar diagnostico em apoio publico verificavel" in html
+    assert "transformar diagnóstico em apoio público verificável" in html
     assert "Depois da assinatura" in html
-    assert "Seu apoio fica registrado de forma unica" in html
+    assert "Seu apoio fica registrado de forma única" in html
     assert '<form method="post" action="/apoios/assinar">' in html
 
 
@@ -579,7 +579,7 @@ def test_apoios_assinar_evitar_duplicidade(client):
 
     assert primeiro.status_code == 200
     assert segundo.status_code == 200
-    assert "ja foi registrada" in segundo.get_data(as_text=True)
+    assert "já foi registrada" in segundo.get_data(as_text=True)
 
 
 @pytest.mark.functional
@@ -712,7 +712,7 @@ def test_admin_usuarios_criar_duplicado_retorna_400(client):
     )
 
     assert response.status_code == 400
-    assert "Ja existe usuario com esse email" in response.get_data(as_text=True)
+    assert "Já existe usuário com esse e-mail" in response.get_data(as_text=True)
 
 
 @pytest.mark.functional
@@ -766,7 +766,7 @@ def test_admin_usuarios_bloqueia_autodemocao_de_papel(client):
     )
 
     assert response.status_code == 400
-    assert "Nao e permitido remover seu proprio papel de admin." in response.get_data(as_text=True)
+    assert "Não é permitido remover seu próprio papel de admin." in response.get_data(as_text=True)
 
     with client.application.app_context():
         admin = Usuario.query.filter_by(id=admin_id).first()
@@ -788,7 +788,7 @@ def test_admin_usuarios_bloqueia_autodesativacao(client):
 
     response = client.post(f"/admin/usuarios/{admin_id}/desativar")
     assert response.status_code == 400
-    assert "Nao e permitido desativar seu proprio usuario admin." in response.get_data(as_text=True)
+    assert "Não é permitido desativar seu próprio usuário admin." in response.get_data(as_text=True)
 
     with client.application.app_context():
         admin = Usuario.query.filter_by(id=admin_id).first()

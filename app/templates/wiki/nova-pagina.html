@@ -1,15 +1,15 @@
 {% extends "publico/base.html" %}
 
-{% block title %}Nova Pagina Wiki | Mais Uma no STF{% endblock %}
+{% block title %}Nova Página Wiki | Mais Uma no STF{% endblock %}
 
 {% block head_extras %}
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/easymde/dist/easymde.min.css">
 {% endblock %}
 
 {% block content %}
-<section class="learn-more-box" id="wiki-nova-pagina" aria-label="Criacao de pagina wiki">
-  <h1>Nova Pagina Wiki</h1>
-  <p>Use este formulario para criar uma nova pagina da wiki.</p>
+<section class="learn-more-box" id="wiki-nova-pagina" aria-label="Criação de página wiki">
+  <h1>Nova Página Wiki</h1>
+  <p>Use este formulário para criar uma nova página da wiki.</p>
 
   {% if erro %}
     <p class="civic-alert"><strong>Erro:</strong> {{ erro }}</p>
@@ -17,20 +17,20 @@
 
   <form method="post" action="{{ url_for('wiki.salvar_nova_pagina_wiki') }}">
     <p>
-      <label for="titulo"><strong>Titulo</strong></label><br>
+      <label for="titulo"><strong>Título</strong></label><br>
       <input id="titulo" name="titulo" type="text" value="{{ valores.titulo or '' }}" required style="width:100%;max-width:820px;">
     </p>
     <p>
       <label for="slug"><strong>Slug (opcional)</strong></label><br>
       <input id="slug" name="slug" type="text" value="{{ valores.slug or '' }}" style="width:100%;max-width:820px;">
-      <small>Se vazio, sera gerado automaticamente a partir do titulo.</small>
+      <small>Se vazio, será gerado automaticamente a partir do título.</small>
     </p>
     <p>
-      <label for="conteudo_markdown"><strong>Conteudo (Markdown)</strong></label><br>
+      <label for="conteudo_markdown"><strong>Conteúdo (Markdown)</strong></label><br>
       <textarea id="conteudo_markdown" name="conteudo_markdown" rows="16">{{ valores.conteudo_markdown or '' }}</textarea>
     </p>
     <p>
-      <button class="cta-btn" type="submit">Criar pagina</button>
+      <button class="cta-btn" type="submit">Criar página</button>
     </p>
   </form>
 </section>
@@ -54,7 +54,7 @@
       form?.addEventListener('submit', (event) => {
         if (!easyMde.value().trim()) {
           event.preventDefault();
-          alert('Conteudo e obrigatorio.');
+          alert('Conteúdo é obrigatório.');
         }
       });
     }

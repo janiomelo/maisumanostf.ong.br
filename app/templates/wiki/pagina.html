@@ -3,7 +3,7 @@
 {% block title %}{{ pagina.titulo }} | Wiki{% endblock %}
 
 {% block content %}
-<section class="learn-more-box" id="wiki-pagina" aria-label="Pagina da Wiki">
+<section class="learn-more-box" id="wiki-pagina" aria-label="Página da Wiki">
   <h1>{{ pagina.titulo }}</h1>
 
   {% for bloco in pagina.blocos %}
@@ -14,6 +14,6 @@
     {% endif %}
   {% endfor %}
 
-  <p><a href="{{ url_for('wiki.editar_pagina_wiki', slug=pagina.slug) }}">Editar esta pagina (acesso autenticado)</a></p>
+  <p><a href="{{ url_for('wiki.editar_pagina_wiki', slug=pagina.slug) }}">Editar esta página (acesso autenticado)</a></p>
 </section>
 {% endblock %}

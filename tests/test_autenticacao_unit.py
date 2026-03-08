@@ -75,16 +75,16 @@ def test_login_retorna_503_quando_banco_esta_indisponivel(client, monkeypatch):
 
     assert response.status_code == 503
     html = response.get_data(as_text=True)
-    assert "Servico temporariamente indisponivel" in html
+    assert "Serviço temporariamente indisponível" in html
 
 
 @pytest.mark.unit
 def test_criar_usuario_valida_email_e_senha_obrigatorios(app_instance):
     with app_instance.app_context():
-        with pytest.raises(ValueError, match="Email e obrigatorio"):
+        with pytest.raises(ValueError, match="E-mail é obrigatório"):
             criar_usuario("   ", "123456", papel="editor")
 
-        with pytest.raises(ValueError, match="Senha e obrigatoria"):
+        with pytest.raises(ValueError, match="Senha é obrigatória"):
             criar_usuario("novo@teste.local", "", papel="editor")
 
 
@@ -161,14 +161,14 @@ def test_registrar_e_limpar_sessao_usuario(app_instance):
 @pytest.mark.unit
 def test_atualizar_usuario_inexistente_retorna_erro(app_instance):
     with app_instance.app_context():
-        with pytest.raises(ValueError, match="Usuario nao encontrado"):
+        with pytest.raises(ValueError, match="Usuário não encontrado"):
             atualizar_usuario(usuario_id=9999, papel="editor", senha="")
 
 
 @pytest.mark.unit
 def test_definir_usuario_ativo_inexistente_retorna_erro(app_instance):
     with app_instance.app_context():
-        with pytest.raises(ValueError, match="Usuario nao encontrado"):
+        with pytest.raises(ValueError, match="Usuário não encontrado"):
             definir_usuario_ativo(usuario_id=9999, ativo=False)
 
 
@@ -218,7 +218,7 @@ def test_oauth_google_iniciar_retorna_mensagem_amigavel_quando_cliente_nao_inici
     response = client.get("/auth/google/iniciar")
 
     assert response.status_code == 200
-    assert "Nao foi possivel iniciar o login com Google" in response.get_data(as_text=True)
+    assert "Não foi possível iniciar o login com Google" in response.get_data(as_text=True)
 
 
 @pytest.mark.functional
@@ -290,7 +290,7 @@ def test_oauth_google_callback_retorna_400_quando_google_nao_envia_sub_ou_email(
     response = client.get("/auth/google/callback")
 
     assert response.status_code == 400
-    assert "Dados de autenticacao invalidos retornados pelo Google" in response.get_data(as_text=True)
+    assert "Dados de autenticação inválidos retornados pelo Google" in response.get_data(as_text=True)
 
 
 @pytest.mark.unit

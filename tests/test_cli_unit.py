@@ -46,7 +46,7 @@ def test_cli_criar_usuario_retorna_erro_para_email_duplicado(app_instance):
     )
 
     assert resultado.exit_code != 0
-    assert "Error: Ja existe usuario com esse email" in resultado.output
+    assert "Error: Já existe usuário com esse e-mail" in resultado.output
 
 
 @pytest.mark.unit

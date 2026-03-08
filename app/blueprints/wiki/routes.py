@@ -84,7 +84,7 @@ def salvar_pagina_wiki(slug: str):
 		if not pagina_atual:
 			abort(404)
 
-		erro = "Titulo e conteudo sao obrigatorios para salvar a pagina."
+		erro = "Título e conteúdo são obrigatórios para salvar a página."
 		return render_template("wiki/editar-pagina.html", pagina=pagina_atual, erro=erro), 400
 
 	return redirect(url_for("wiki.pagina_wiki", slug=slug))

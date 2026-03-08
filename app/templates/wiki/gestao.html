@@ -1,26 +1,26 @@
 {% extends "publico/base.html" %}
 
-{% block title %}Gestao da Wiki | Mais Uma no STF{% endblock %}
+{% block title %}Gestão da Wiki | Mais Uma no STF{% endblock %}
 
 {% block content %}
-<section class="learn-more-box" id="wiki-gestao" aria-label="Gestao da Wiki">
-  <h1>Gestao da Wiki</h1>
-  <p>Area autenticada para criar e editar paginas da wiki.</p>
+<section class="learn-more-box" id="wiki-gestao" aria-label="Gestão da Wiki">
+  <h1>Gestão da Wiki</h1>
+  <p>Área autenticada para criar e editar páginas da wiki.</p>
 
   <p>
-    <a class="cta-btn" href="{{ url_for('wiki.nova_pagina_wiki') }}">Criar nova pagina</a>
+    <a class="cta-btn" href="{{ url_for('wiki.nova_pagina_wiki') }}">Criar nova página</a>
   </p>
 
   <ul class="learn-more-list">
     {% for pagina in paginas %}
       <li>
         <strong>{{ pagina.titulo }}</strong><br>
-        <a href="{{ url_for('wiki.pagina_wiki', slug=pagina.slug) }}">Ver pagina</a>
+        <a href="{{ url_for('wiki.pagina_wiki', slug=pagina.slug) }}">Ver página</a>
         ·
         <a href="{{ url_for('wiki.editar_pagina_wiki', slug=pagina.slug) }}">Editar</a>
       </li>
     {% else %}
-      <li>Nenhuma pagina cadastrada.</li>
+      <li>Nenhuma página cadastrada.</li>
     {% endfor %}
   </ul>
 </section>

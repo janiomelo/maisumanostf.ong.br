@@ -1,17 +1,17 @@
 {% extends "publico/base.html" %}
 
-{% block title %}Admin de Usuarios | Mais Uma no STF{% endblock %}
+{% block title %}Admin de Usuários | Mais Uma no STF{% endblock %}
 
 {% block content %}
-<section class="learn-more-box" id="admin-usuarios" aria-label="Gestao interna de usuarios">
-  <h1>Admin de Usuarios</h1>
-  <p>CRUD interno de usuarios e papeis de acesso.</p>
+<section class="learn-more-box" id="admin-usuarios" aria-label="Gestão interna de usuários">
+  <h1>Admin de Usuários</h1>
+  <p>CRUD interno de usuários e papéis de acesso.</p>
 
   {% if erro %}
     <p class="civic-alert"><strong>Erro:</strong> {{ erro }}</p>
   {% endif %}
 
-  <h2>Criar usuario</h2>
+  <h2>Criar usuário</h2>
   <form method="post" action="{{ url_for('admin.criar_usuario_admin') }}">
     <p>
       <label for="email"><strong>E-mail</strong></label><br>
@@ -30,11 +30,11 @@
       </select>
     </p>
     <p>
-      <button class="cta-btn" type="submit">Criar usuario</button>
+      <button class="cta-btn" type="submit">Criar usuário</button>
     </p>
   </form>
 
-  <h2>Usuarios cadastrados</h2>
+  <h2>Usuários cadastrados</h2>
   <div style="overflow:auto;">
     <table>
       <thead>
@@ -42,7 +42,7 @@
           <th>E-mail</th>
           <th>Papel</th>
           <th>Status</th>
-          <th>Acoes</th>
+          <th>Ações</th>
         </tr>
       </thead>
       <tbody>
@@ -75,7 +75,7 @@
           </tr>
         {% else %}
           <tr>
-            <td colspan="4">Nenhum usuario cadastrado.</td>
+            <td colspan="4">Nenhum usuário cadastrado.</td>
           </tr>
         {% endfor %}
       </tbody>

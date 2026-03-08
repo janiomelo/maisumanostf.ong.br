@@ -21,7 +21,7 @@ def assinar_manifesto():
 
 	apoio_existente = ApoioManifesto.query.filter_by(email=str(g.usuario_email).lower()).first()
 	if apoio_existente:
-		sucesso = "Sua assinatura ja foi registrada. Obrigada pelo apoio!"
+		sucesso = "Sua assinatura já foi registrada. Obrigada pelo apoio!"
 		return render_template("apoios/assinar.html", erro=None, sucesso=sucesso, nome=apoio_existente.nome)
 
 	return render_template("apoios/assinar.html", erro=None, sucesso=None, nome="")
@@ -41,7 +41,7 @@ def salvar_assinatura_manifesto():
 	email = str(g.usuario_email).strip().lower()
 	apoio_existente = ApoioManifesto.query.filter_by(email=email).first()
 	if apoio_existente:
-		sucesso = "Sua assinatura ja foi registrada. Obrigada pelo apoio!"
+		sucesso = "Sua assinatura já foi registrada. Obrigada pelo apoio!"
 		return render_template("apoios/assinar.html", erro=None, sucesso=sucesso, nome=apoio_existente.nome)
 
 	db.session.add(ApoioManifesto(email=email, nome=nome))

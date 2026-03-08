@@ -44,12 +44,12 @@ def processar_entrada():
     try:
         usuario = autenticar(email, senha)
     except BancoIndisponivelError:
-        current_app.logger.exception("Falha de conexao com banco durante login")
-        erro = "Servico temporariamente indisponivel. Tente novamente em instantes."
+        current_app.logger.exception("Falha de conexão com banco durante login")
+        erro = "Serviço temporariamente indisponível. Tente novamente em instantes."
         return render_template("autenticacao/entrar.html", erro=erro, proximo=proximo), 503
 
     if not usuario:
-        erro = "Credenciais invalidas. Verifique e tente novamente."
+        erro = "Credenciais inválidas. Verifique e tente novamente."
         return render_template("autenticacao/entrar.html", erro=erro, proximo=proximo), 401
 
     registrar_sessao_usuario(usuario["email"], usuario["papel"])
@@ -60,7 +60,7 @@ def processar_entrada():
 @autenticacao_bp.get("/auth/google/iniciar")
 def iniciar_oauth_google():
     if not google_oauth_esta_configurado(current_app.config):
-        erro = "Login com Google indisponivel no momento."
+        erro = "Login com Google indisponível no momento."
         return render_template("autenticacao/entrar.html", erro=erro, proximo=""), 200
 
     proximo = _destino_seguro(request.args.get("proximo", url_for("apoios.assinar_manifesto")))
@@ -71,8 +71,8 @@ def iniciar_oauth_google():
         callback_url = _obter_callback_oauth_google()
         return cliente.authorize_redirect(callback_url, prompt="select_account")
     except GoogleOAuthError:
-        current_app.logger.exception("Cliente OAuth Google nao inicializado")
-        erro = "Nao foi possivel iniciar o login com Google."
+        current_app.logger.exception("Cliente OAuth Google não inicializado")
+        erro = "Não foi possível iniciar o login com Google."
         return render_template("autenticacao/entrar.html", erro=erro, proximo=proximo), 200
 
 
@@ -88,7 +88,7 @@ def callback_oauth_google():
         return render_template("autenticacao/entrar.html", erro=erro, proximo=proximo), 400
 
     if not dados_usuario.get("email") or not dados_usuario.get("sub"):
-        erro = "Dados de autenticacao invalidos retornados pelo Google."
+        erro = "Dados de autenticação inválidos retornados pelo Google."
         return render_template("autenticacao/entrar.html", erro=erro, proximo=proximo), 400
 
     if not dados_usuario.get("email_verified"):
@@ -102,8 +102,8 @@ def callback_oauth_google():
             bool(dados_usuario.get("email_verified", False)),
         )
     except Exception:
-        current_app.logger.exception("Falha ao persistir/vincular usuario local apos login Google")
-        erro = "Nao foi possivel concluir o login com Google agora. Tente novamente em instantes."
+        current_app.logger.exception("Falha ao persistir/vincular usuário local após login Google")
+        erro = "Não foi possível concluir o login com Google agora. Tente novamente em instantes."
         return render_template("autenticacao/entrar.html", erro=erro, proximo=proximo), 400
 
     registrar_sessao_usuario(usuario.email, usuario.papel)

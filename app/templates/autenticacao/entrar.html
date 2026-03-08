@@ -14,7 +14,7 @@
   {% if config.get('GOOGLE_OAUTH_ENABLED') %}
     <section class="login-principal" aria-label="Entrada principal">
       <h2>Entrar com Google</h2>
-      <p class="login-help">Recomendado para todas as pessoas usuarias, inclusive administracao.</p>
+      <p class="login-help">Recomendado para todas as pessoas usuárias, inclusive administração.</p>
       <p>
         <a class="cta-btn" href="{{ url_for('autenticacao.iniciar_oauth_google', proximo=proximo or url_for('apoios.assinar_manifesto')) }}">Continuar com Google</a>
       </p>
@@ -23,8 +23,8 @@
     <hr class="login-divider">
 
     <details class="login-secundario">
-      <summary>Usar e-mail e senha (secundario)</summary>
-      <p class="login-help">Metodo legado temporario enquanto outras integracoes sao preparadas.</p>
+      <summary>Usar e-mail e senha (secundário)</summary>
+      <p class="login-help">Método legado temporário enquanto outras integrações são preparadas.</p>
       <form method="post" action="{{ url_for('autenticacao.processar_entrada') }}">
         <input type="hidden" name="proximo" value="{{ proximo }}">
         <p>

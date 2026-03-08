@@ -19,11 +19,11 @@
   <script defer src="{{ url_for('static', filename='main.js') }}"></script>
 </head>
 <body>
-  <a class="skip-link" href="#conteudo-principal">Ir para o conteudo principal</a>
+  <a class="skip-link" href="#conteudo-principal">Ir para o conteúdo principal</a>
   <header class="topbar">
     <div class="container nav-wrap">
       <a class="logo" href="{{ url_for('main.home') }}">Mais Uma No STF</a>
-      <nav aria-label="Navegacao principal">
+      <nav aria-label="Navegação principal">
         <a href="#manifesto">Manifesto</a>
         <a href="#sobre">Sobre</a>
         <a href="#transparencia">Transparência</a>
@@ -31,7 +31,7 @@
       <div class="auth-area">
         {% if usuario_esta_logado %}
           {% if papel_atual == "admin" %}
-            <a href="{{ url_for('admin.listar_usuarios_admin') }}">Admin usuarios</a>
+            <a href="{{ url_for('admin.listar_usuarios_admin') }}">Admin usuários</a>
           {% endif %}
           <small>{{ usuario_email }} ({{ papel_atual }})</small>
           <form method="post" action="{{ url_for('autenticacao.sair') }}">
@@ -59,7 +59,7 @@
         </p>
       </section>
 
-      <section id="transparencia" aria-label="Transparencia e autoria">
+      <section id="transparencia" aria-label="Transparência e autoria">
         <h3>Transparência</h3>
         <p>
           Desenvolvedor e primeiro subscritor: Janio Melo.

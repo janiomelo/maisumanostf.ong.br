@@ -3,15 +3,15 @@
 {% block title %}Wiki | Mais Uma no STF{% endblock %}
 
 {% block content %}
-<section class="learn-more-box" id="wiki-indice" aria-label="Indice da Wiki">
+<section class="learn-more-box" id="wiki-indice" aria-label="Índice da Wiki">
   <h1>Wiki da Campanha</h1>
-  <p>Espaco de publicacao e organizacao dos conteudos estruturantes do movimento.</p>
+  <p>Espaço de publicação e organização dos conteúdos estruturantes do movimento.</p>
 
   {% if usuario_esta_logado and papel_atual in ["editor", "admin"] %}
     <p>
-      <a href="{{ url_for('wiki.gestao_wiki') }}">Area de gestao</a>
+      <a href="{{ url_for('wiki.gestao_wiki') }}">Área de gestão</a>
       ·
-      <a href="{{ url_for('wiki.nova_pagina_wiki') }}">Nova pagina</a>
+      <a href="{{ url_for('wiki.nova_pagina_wiki') }}">Nova página</a>
     </p>
   {% endif %}
 
@@ -22,7 +22,7 @@
         <small> - {{ pagina.resumo }}</small>
       </li>
     {% else %}
-      <li>Nenhuma pagina wiki publicada ainda.</li>
+      <li>Nenhuma página wiki publicada ainda.</li>
     {% endfor %}
   </ul>
 </section>
