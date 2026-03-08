@@ -65,7 +65,7 @@ def carregar_links_paginas_gerais() -> dict[str, dict[str, str] | None]:
         }
 
     return {
-        "estatuto": _resolver(cfg[CHAVE_WIKI_ESTATUTO], "Estatuto"),
+        "estatuto": _resolver(cfg[CHAVE_WIKI_ESTATUTO], "Transparência e Governança"),
         "politica_privacidade": _resolver(cfg[CHAVE_WIKI_POLITICA_PRIVACIDADE], "Política de Privacidade"),
         "termos_uso": _resolver(cfg[CHAVE_WIKI_TERMOS_USO], "Termos de Uso"),
     }

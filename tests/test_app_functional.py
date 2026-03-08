@@ -920,7 +920,7 @@ def test_admin_paginas_gerais_permite_ocultar_links(client):
     html = home.get_data(as_text=True)
     assert "Política de Privacidade" not in html
     assert "Termos de Uso" not in html
-    assert "Estatuto</a>" not in html
+    assert "Transparência e Governança" not in html
 
 
 @pytest.mark.functional

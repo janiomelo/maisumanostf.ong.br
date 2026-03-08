@@ -136,3 +136,169 @@ def test_criar_pagina_wiki_rejeita_payload_invalido(app_instance):
                 titulo="Titulo valido",
                 conteudo_markdown="# Titulo valido\n\nTexto.",
             )
+
+
+@pytest.mark.unit
+def test_listar_paginas_wiki_usa_resumo_padrao_quando_sem_paragrafo(app_instance):
+    with app_instance.app_context():
+        db.session.add(
+            WikiPagina(
+                slug="somente-secao",
+                titulo="",
+                conteudo_markdown="# Titulo Sem Resumo\n\n## Secao",
+            )
+        )
+        db.session.commit()
+
+        paginas = wiki.listar_paginas_wiki()
+        pagina = next(item for item in paginas if item["slug"] == "somente-secao")
+
+        assert pagina["titulo"] == "Titulo Sem Resumo"
+        assert pagina["resumo"] == "Sem resumo."
+
+
+@pytest.mark.unit
+def test_carregar_pagina_wiki_renderiza_blocos_markdown_restantes(app_instance):
+    with app_instance.app_context():
+        db.session.add(
+            WikiPagina(
+                slug="markdown-completo",
+                titulo="Markdown Completo",
+                conteudo_markdown=(
+                    "# Markdown Completo\n\n"
+                    "### Subtitulo\n\n"
+                    "1. Primeiro\n2. Segundo\n\n"
+                    "```\n"
+                    "print('<x>')\n"
+                    "```\n\n"
+                    "Texto antes\ncontinua na mesma ideia\n\n"
+                    "## Encerramento\n"
+                ),
+            )
+        )
+        db.session.commit()
+
+        pagina = wiki.carregar_pagina_wiki("markdown-completo")
+
+        assert pagina is not None
+        html = pagina["conteudo_html"]
+        assert "<h3>Subtitulo</h3>" in html
+        assert "<ol><li>Primeiro</li><li>Segundo</li></ol>" in html
+        assert "<pre><code>print(&#x27;&lt;x&gt;&#x27;)</code></pre>" in html
+        assert "<p>Texto antes continua na mesma ideia</p>" in html
+        assert "<h2>Encerramento</h2>" in html
+
+
+@pytest.mark.unit
+def test_carregar_pagina_wiki_link_invalido_fica_escapado(app_instance):
+    with app_instance.app_context():
+        db.session.add(
+            WikiPagina(
+                slug="link-invalido",
+                titulo="Link Invalido",
+                conteudo_markdown="# Link Invalido\n\n[ataque](javascript:alert(1))",
+            )
+        )
+        db.session.commit()
+
+        pagina = wiki.carregar_pagina_wiki("link-invalido")
+
+        assert pagina is not None
+        html = pagina["conteudo_html"]
+        assert '<a href="javascript:alert(1)"' not in html
+        assert "[ataque](javascript:alert(1))" in html
+
+
+@pytest.mark.unit
+def test_atualizar_pagina_wiki_retorna_none_para_slug_invalido_ou_inexistente(app_instance):
+    with app_instance.app_context():
+        assert wiki.atualizar_pagina_wiki("../invalido", "Titulo", "# Titulo") is None
+        assert wiki.atualizar_pagina_wiki("nao-existe", "Titulo", "# Titulo") is None
+
+
+@pytest.mark.unit
+def test_criar_pagina_wiki_falha_se_recarga_pos_commit_retorna_none(app_instance, monkeypatch):
+    with app_instance.app_context():
+        original = wiki.carregar_pagina_wiki
+
+        def _retorna_none_apenas_na_nova(slug: str):
+            if slug == "falha-recarga":
+                return None
+            return original(slug)
+
+        monkeypatch.setattr(wiki, "carregar_pagina_wiki", _retorna_none_apenas_na_nova)
+
+        with pytest.raises(ValueError, match="Falha ao carregar página após criação"):
+            wiki.criar_pagina_wiki(
+                slug="falha-recarga",
+                titulo="Falha Recarga",
+                conteudo_markdown="# Falha Recarga\n\nConteudo",
+            )
+
+
+@pytest.mark.unit
+def test_carregar_pagina_wiki_sem_h1_usa_titulo_padrao_parse(app_instance):
+    with app_instance.app_context():
+        db.session.add(
+            WikiPagina(
+                slug="sem-h1",
+                titulo="",
+                conteudo_markdown="Texto inicial sem h1.",
+            )
+        )
+        db.session.commit()
+
+        pagina = wiki.carregar_pagina_wiki("sem-h1")
+
+        assert pagina is not None
+        assert pagina["titulo"] == "Página Wiki"
+
+
+@pytest.mark.unit
+def test_carregar_pagina_wiki_renderiza_link_relativo_e_quebra_paragrafo(app_instance):
+    with app_instance.app_context():
+        db.session.add(
+            WikiPagina(
+                slug="quebra-paragrafo",
+                titulo="Quebra",
+                conteudo_markdown=(
+                    "# Quebra\n\n"
+                    "linha 1 [interno](/wiki/abc)\n"
+                    "## Nova secao\n"
+                    "linha 2\n"
+                    "- item"
+                ),
+            )
+        )
+        db.session.commit()
+
+        pagina = wiki.carregar_pagina_wiki("quebra-paragrafo")
+
+        assert pagina is not None
+        html = pagina["conteudo_html"]
+        assert '<a href="/wiki/abc" rel="noopener">interno</a>' in html
+        assert "<h2>Nova secao</h2>" in html
+        assert "<ul><li>item</li></ul>" in html
+
+
+@pytest.mark.unit
+def test_atualizar_pagina_wiki_atualiza_com_sucesso(app_instance):
+    with app_instance.app_context():
+        db.session.add(
+            WikiPagina(
+                slug="atualizar-ok",
+                titulo="Titulo Antigo",
+                conteudo_markdown="# Antigo\n\nTexto antigo",
+            )
+        )
+        db.session.commit()
+
+        atualizada = wiki.atualizar_pagina_wiki(
+            "atualizar-ok",
+            "  Titulo Novo  ",
+            "  # Novo\n\nTexto novo  ",
+        )
+
+        assert atualizada is not None
+        assert atualizada["titulo"] == "Titulo Novo"
+        assert "Texto novo" in atualizada["conteudo_markdown"]

@@ -5,7 +5,7 @@
 {% block content %}
 <section class="learn-more-box" id="admin-paginas-gerais" aria-label="Configuração de páginas gerais">
   <h1>Páginas Gerais</h1>
-  <p>Associe quais páginas da wiki representam Estatuto, Política de Privacidade e Termos de Uso.</p>
+  <p>Associe quais páginas da wiki representam Transparência e Governança, Política de Privacidade e Termos de Uso.</p>
 
   {% include "admin/_abas.html" %}
 
@@ -15,7 +15,7 @@
 
   <form method="post" action="{{ url_for('admin.salvar_paginas_gerais_admin') }}">
     <p>
-      <label for="{{ chave_estatuto }}"><strong>Estatuto</strong></label><br>
+      <label for="{{ chave_estatuto }}"><strong>Transparência e Governança</strong></label><br>
       <select id="{{ chave_estatuto }}" name="{{ chave_estatuto }}" style="max-width:620px;">
         <option value="">Não exibir</option>
         {% for pagina in paginas_wiki %}
