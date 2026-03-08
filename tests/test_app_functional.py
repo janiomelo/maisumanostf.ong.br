@@ -14,6 +14,7 @@ def test_create_app_registra_rotas_principais():
     rotas = {rule.rule for rule in app.url_map.iter_rules()}
 
     assert "/" in rotas
+    assert "/sitemap.xml" in rotas
     assert "/robots.txt" in rotas
     assert "/api/contagem-regressiva" in rotas
     assert "/api/countdown" in rotas
@@ -128,6 +129,20 @@ def test_robots_txt_permite_indexacao_total(client):
     body = response.get_data(as_text=True)
     assert "User-agent: *" in body
     assert "Allow: /" in body
+    assert "Sitemap: " in body
+    assert "/sitemap.xml" in body
+
+
+@pytest.mark.functional
+def test_sitemap_xml_lista_paginas_publicas(client):
+    response = client.get("/sitemap.xml")
+
+    assert response.status_code == 200
+    assert response.mimetype == "application/xml"
+    body = response.get_data(as_text=True)
+    assert "<urlset" in body
+    assert "<loc>http://localhost/</loc>" in body
+    assert "<loc>http://localhost/wiki/</loc>" in body
 
 
 @pytest.mark.functional

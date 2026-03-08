@@ -1,4 +1,4 @@
-from flask import Blueprint, jsonify, make_response, render_template
+from flask import Blueprint, jsonify, make_response, render_template, request, url_for
 
 from app.domain.campanha import (
     build_chart_payload,
@@ -60,7 +60,34 @@ def api_countdown_legado():
 
 @publico_bp.get("/robots.txt")
 def robots_txt():
-    conteudo = "User-agent: *\nAllow: /\n"
+    sitemap_url = url_for("main.sitemap_xml", _external=True)
+    conteudo = f"User-agent: *\nAllow: /\nSitemap: {sitemap_url}\n"
     response = make_response(conteudo)
     response.mimetype = "text/plain"
+    return response
+
+
+@publico_bp.get("/sitemap.xml")
+def sitemap_xml():
+    paginas = [
+        url_for("main.home", _external=True),
+        url_for("wiki.indice_wiki", _external=True),
+    ]
+
+    linhas = [
+        '<?xml version="1.0" encoding="UTF-8"?>',
+        '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">',
+    ]
+    for pagina in paginas:
+        linhas.extend(
+            [
+                "  <url>",
+                f"    <loc>{pagina}</loc>",
+                "  </url>",
+            ]
+        )
+    linhas.append("</urlset>")
+
+    response = make_response("\n".join(linhas))
+    response.mimetype = "application/xml"
     return response
