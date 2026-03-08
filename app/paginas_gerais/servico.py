@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-from flask import url_for
-
 from app.dados.base import db
 from app.dados.modelos import ConfiguracaoPublica, WikiPagina
 
@@ -63,7 +61,7 @@ def carregar_links_paginas_gerais() -> dict[str, dict[str, str] | None]:
         return {
             "slug": slug_limpo,
             "titulo": pagina.titulo or titulo_padrao,
-            "url": url_for("wiki.pagina_wiki", slug=slug_limpo),
+            "url": f"/wiki/{slug_limpo}",
         }
 
     return {
