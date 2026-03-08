@@ -23,11 +23,6 @@
   <header class="topbar">
     <div class="container nav-wrap">
       <a class="logo" href="{{ url_for('main.home') }}">Mais Uma No STF</a>
-      <nav aria-label="Navegação principal">
-        <a href="#manifesto">Manifesto</a>
-        <a href="#sobre">Sobre</a>
-        <a href="#transparencia">Transparência</a>
-      </nav>
       <div class="auth-area">
         {% if usuario_esta_logado %}
           {% if papel_atual == "admin" %}
