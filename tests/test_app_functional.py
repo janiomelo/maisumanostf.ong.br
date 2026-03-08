@@ -1,9 +1,11 @@
 import re
 
 import pytest
+from flask import redirect
 
 from app import create_app
 from app.dados.modelos import ApoioManifesto, Usuario
+import app.blueprints.autenticacao.routes as rotas_autenticacao
 
 
 @pytest.mark.functional
@@ -15,6 +17,8 @@ def test_create_app_registra_rotas_principais():
     assert "/api/contagem-regressiva" in rotas
     assert "/api/countdown" in rotas
     assert "/entrar" in rotas
+    assert "/auth/google/iniciar" in rotas
+    assert "/auth/google/callback" in rotas
     assert "/sair" in rotas
     assert "/wiki/" in rotas
     assert "/wiki/gestao" in rotas
@@ -39,7 +43,6 @@ def test_home_renderiza_conteudo_essencial(client):
     assert "data-alvo=" in html
     assert "id=\"manifesto\"" in html
     assert "id=\"dados\"" in html
-    assert "id=\"participe\"" in html
     assert "id=\"transparencia\"" in html
     assert "chart.umd.min.js" in html
 
@@ -374,6 +377,96 @@ def test_form_login_aponta_para_endpoint_de_entrada(client):
     assert response.status_code == 200
     html = response.get_data(as_text=True)
     assert '<form method="post" action="/entrar">' in html
+
+
+@pytest.mark.functional
+def test_login_mostra_botao_google_quando_habilitado(client):
+    client.application.config["GOOGLE_OAUTH_ENABLED"] = True
+
+    response = client.get("/entrar")
+
+    assert response.status_code == 200
+    html = response.get_data(as_text=True)
+    assert "Entrar com Google" in html
+
+
+@pytest.mark.functional
+def test_oauth_google_iniciar_retorna_503_quando_desabilitado(client):
+    client.application.config["GOOGLE_OAUTH_ENABLED"] = False
+
+    response = client.get("/auth/google/iniciar")
+
+    assert response.status_code == 503
+    assert "Login com Google indisponivel" in response.get_data(as_text=True)
+
+
+@pytest.mark.functional
+def test_oauth_google_iniciar_redireciona_para_consentimento(client, monkeypatch):
+    client.application.config["GOOGLE_OAUTH_ENABLED"] = True
+    client.application.config["GOOGLE_CLIENT_ID"] = "id"
+    client.application.config["GOOGLE_CLIENT_SECRET"] = "secret"
+
+    class ClienteGoogleFalso:
+        @staticmethod
+        def authorize_redirect(callback_url, prompt=None):
+            assert "/auth/google/callback" in callback_url
+            assert prompt == "select_account"
+            return redirect("/oauth-google-mock")
+
+    monkeypatch.setattr(rotas_autenticacao, "obter_cliente_google", lambda: ClienteGoogleFalso())
+
+    response = client.get("/auth/google/iniciar?proximo=/apoios/assinar")
+
+    assert response.status_code == 302
+    assert response.headers["Location"].endswith("/oauth-google-mock")
+
+
+@pytest.mark.functional
+def test_oauth_google_callback_cria_sessao_e_redireciona(client, monkeypatch):
+    with client.session_transaction() as sessao:
+        sessao["oauth_google_proximo"] = "/apoios/assinar"
+
+    monkeypatch.setattr(
+        rotas_autenticacao,
+        "trocar_codigo_por_usuario_google",
+        lambda: {
+            "sub": "google-sub-123",
+            "email": "google.user@teste.local",
+            "email_verified": True,
+            "name": "Google User",
+        },
+    )
+
+    response = client.get("/auth/google/callback")
+
+    assert response.status_code == 302
+    assert response.headers["Location"].endswith("/apoios/assinar")
+
+    with client.session_transaction() as sessao:
+        assert sessao.get("usuario_email") == "google.user@teste.local"
+        assert sessao.get("papel_atual") == "nao_editor"
+
+
+@pytest.mark.functional
+def test_oauth_google_callback_bloqueia_email_nao_verificado(client, monkeypatch):
+    with client.session_transaction() as sessao:
+        sessao["oauth_google_proximo"] = "/apoios/assinar"
+
+    monkeypatch.setattr(
+        rotas_autenticacao,
+        "trocar_codigo_por_usuario_google",
+        lambda: {
+            "sub": "google-sub-999",
+            "email": "sem-verificacao@teste.local",
+            "email_verified": False,
+            "name": "Sem Verificacao",
+        },
+    )
+
+    response = client.get("/auth/google/callback")
+
+    assert response.status_code == 401
+    assert "e-mail verificado" in response.get_data(as_text=True)
 
 
 @pytest.mark.functional

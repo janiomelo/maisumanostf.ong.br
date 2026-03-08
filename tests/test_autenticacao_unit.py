@@ -10,6 +10,7 @@ from app.autenticacao.servico import (
     definir_usuario_ativo,
     criar_usuario,
     limpar_sessao_usuario,
+    obter_ou_criar_usuario_google,
     registrar_sessao_usuario,
 )
 from app.dados.modelos import Usuario
@@ -166,3 +167,34 @@ def test_definir_usuario_ativo_inexistente_retorna_erro(app_instance):
     with app_instance.app_context():
         with pytest.raises(ValueError, match="Usuario nao encontrado"):
             definir_usuario_ativo(usuario_id=9999, ativo=False)
+
+
+@pytest.mark.unit
+def test_obter_ou_criar_usuario_google_cria_novo_usuario(app_instance):
+    with app_instance.app_context():
+        usuario = obter_ou_criar_usuario_google(
+            sub="google-sub-abc",
+            email="novo.google@teste.local",
+            email_verificado=True,
+        )
+
+        assert usuario.email == "novo.google@teste.local"
+        assert usuario.google_sub == "google-sub-abc"
+        assert usuario.origem_auth == "google"
+        assert usuario.email_verificado is True
+
+
+@pytest.mark.unit
+def test_obter_ou_criar_usuario_google_vincula_usuario_existente_por_email(app_instance):
+    with app_instance.app_context():
+        criar_usuario("editor.google@teste.local", "123456", papel="editor")
+
+        usuario = obter_ou_criar_usuario_google(
+            sub="google-sub-link",
+            email="editor.google@teste.local",
+            email_verificado=True,
+        )
+
+        assert usuario.email == "editor.google@teste.local"
+        assert usuario.google_sub == "google-sub-link"
+        assert usuario.origem_auth == "google"

@@ -25,5 +25,12 @@
       <button class="cta-btn" type="submit">Entrar</button>
     </p>
   </form>
+
+  {% if config.get('GOOGLE_OAUTH_ENABLED') %}
+    <hr>
+    <p>
+      <a class="cta-btn" href="{{ url_for('autenticacao.iniciar_oauth_google', proximo=proximo or url_for('apoios.assinar_manifesto')) }}">Entrar com Google</a>
+    </p>
+  {% endif %}
 </section>
 {% endblock %}

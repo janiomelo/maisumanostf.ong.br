@@ -1,10 +1,15 @@
-from flask import Blueprint, current_app, g, redirect, render_template, request, url_for
+from flask import Blueprint, current_app, g, redirect, render_template, request, session, url_for
 
 from app.autenticacao import (
     BancoIndisponivelError,
+    GoogleOAuthError,
     autenticar,
+    google_oauth_esta_configurado,
     limpar_sessao_usuario,
+    obter_cliente_google,
+    obter_ou_criar_usuario_google,
     registrar_sessao_usuario,
+    trocar_codigo_por_usuario_google,
 )
 
 autenticacao_bp = Blueprint("autenticacao", __name__)
@@ -42,6 +47,54 @@ def processar_entrada():
     registrar_sessao_usuario(usuario["email"], usuario["papel"])
     destino = _destino_seguro(proximo or url_for("wiki.indice_wiki"))
     return redirect(destino)
+
+
+@autenticacao_bp.get("/auth/google/iniciar")
+def iniciar_oauth_google():
+    if not google_oauth_esta_configurado(current_app.config):
+        erro = "Login com Google indisponivel no momento."
+        return render_template("autenticacao/entrar.html", erro=erro, proximo=""), 503
+
+    proximo = _destino_seguro(request.args.get("proximo", url_for("apoios.assinar_manifesto")))
+    session["oauth_google_proximo"] = proximo
+
+    try:
+        cliente = obter_cliente_google()
+        callback_url = url_for("autenticacao.callback_oauth_google", _external=True)
+        return cliente.authorize_redirect(callback_url, prompt="select_account")
+    except GoogleOAuthError:
+        current_app.logger.exception("Cliente OAuth Google nao inicializado")
+        erro = "Nao foi possivel iniciar o login com Google."
+        return render_template("autenticacao/entrar.html", erro=erro, proximo=proximo), 500
+
+
+@autenticacao_bp.get("/auth/google/callback")
+def callback_oauth_google():
+    proximo = _destino_seguro(session.pop("oauth_google_proximo", url_for("apoios.assinar_manifesto")))
+
+    try:
+        dados_usuario = trocar_codigo_por_usuario_google()
+    except GoogleOAuthError:
+        current_app.logger.exception("Falha no callback OAuth Google")
+        erro = "Falha ao validar login com Google. Tente novamente."
+        return render_template("autenticacao/entrar.html", erro=erro, proximo=proximo), 502
+
+    if not dados_usuario.get("email") or not dados_usuario.get("sub"):
+        erro = "Dados de autenticacao invalidos retornados pelo Google."
+        return render_template("autenticacao/entrar.html", erro=erro, proximo=proximo), 400
+
+    if not dados_usuario.get("email_verified"):
+        erro = "Sua conta Google precisa ter e-mail verificado para entrar."
+        return render_template("autenticacao/entrar.html", erro=erro, proximo=proximo), 401
+
+    usuario = obter_ou_criar_usuario_google(
+        dados_usuario["sub"],
+        dados_usuario["email"],
+        bool(dados_usuario.get("email_verified", False)),
+    )
+
+    registrar_sessao_usuario(usuario.email, usuario.papel)
+    return redirect(proximo)
 
 
 @autenticacao_bp.post("/sair")

@@ -59,6 +59,13 @@ Variáveis de autenticação inicial (sessão):
 - Esta configuração cria apenas o admin bootstrap no ambiente
 - Demais usuários devem ser cadastrados no banco (ex.: `make user-create ...`)
 
+Variáveis opcionais para login com Google (OAuth):
+
+- `GOOGLE_OAUTH_ENABLED` (`true` ou `false`)
+- `GOOGLE_CLIENT_ID`
+- `GOOGLE_CLIENT_SECRET`
+- `GOOGLE_DISCOVERY_URL` (padrão Google)
+
 Variável opcional de conexão com banco (PostgreSQL):
 
 - `DB_POOL_RECYCLE_SECONDS` (padrão `300`)
@@ -73,6 +80,8 @@ Para bases legadas sem `alembic_version`, use `make db-update` (aplica stamp e u
 
 - Home: `/`
 - Login: `/entrar`
+- Iniciar login Google: `/auth/google/iniciar`
+- Callback login Google: `/auth/google/callback`
 - Logout: `/sair`
 - Assinatura do manifesto (autenticada): `/apoios/assinar`
 - Wiki pública: `/wiki/`

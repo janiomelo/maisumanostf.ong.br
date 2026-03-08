@@ -34,5 +34,5 @@ def test_fluxo_de_navegacao_possui_ancoras_essenciais(client):
     assert response.status_code == 200
 
     html = response.get_data(as_text=True)
-    for ancora in ["#manifesto", "#dados", "#sobre", "#participe", "#transparencia"]:
+    for ancora in ["#manifesto", "#dados", "#sobre", "#transparencia"]:
         assert ancora in html

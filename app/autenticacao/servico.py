@@ -1,4 +1,5 @@
 import os
+import secrets
 
 from sqlalchemy.exc import OperationalError, ProgrammingError
 from sqlalchemy.orm.exc import NoResultFound
@@ -119,3 +120,42 @@ def registrar_sessao_usuario(email: str, papel: str) -> None:
 def limpar_sessao_usuario() -> None:
     session.pop("usuario_email", None)
     session.pop("papel_atual", None)
+
+
+def obter_ou_criar_usuario_google(sub: str, email: str, email_verificado: bool) -> Usuario:
+    sub_normalizado = sub.strip()
+    email_normalizado = email.strip().lower()
+
+    if not sub_normalizado or not email_normalizado:
+        raise ValueError("Dados invalidos do Google para autenticacao")
+
+    usuario = Usuario.query.filter_by(google_sub=sub_normalizado).first()
+    if usuario:
+        usuario.email = email_normalizado
+        usuario.origem_auth = "google"
+        usuario.email_verificado = bool(email_verificado)
+        usuario.ativo = True
+        db.session.commit()
+        return usuario
+
+    usuario = Usuario.query.filter_by(email=email_normalizado).first()
+    if usuario:
+        usuario.google_sub = sub_normalizado
+        usuario.origem_auth = "google"
+        usuario.email_verificado = bool(email_verificado)
+        usuario.ativo = True
+        db.session.commit()
+        return usuario
+
+    usuario = Usuario(
+        email=email_normalizado,
+        papel="nao_editor",
+        ativo=True,
+        origem_auth="google",
+        google_sub=sub_normalizado,
+        email_verificado=bool(email_verificado),
+    )
+    usuario.definir_senha(secrets.token_urlsafe(32))
+    db.session.add(usuario)
+    db.session.commit()
+    return usuario

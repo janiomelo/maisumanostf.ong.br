@@ -34,6 +34,9 @@ class Usuario(db.Model):
     senha_hash = db.Column(db.String(255), nullable=False)
     papel = db.Column(db.String(40), nullable=False, default="nao_editor")
     ativo = db.Column(db.Boolean, nullable=False, default=True)
+    origem_auth = db.Column(db.String(20), nullable=False, default="local")
+    google_sub = db.Column(db.String(255), unique=True, nullable=True, index=True)
+    email_verificado = db.Column(db.Boolean, nullable=False, default=False)
 
     @staticmethod
     def _agora_utc() -> datetime:

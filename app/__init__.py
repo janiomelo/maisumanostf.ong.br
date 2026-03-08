@@ -3,6 +3,7 @@ import os
 from flask import Flask, g, session
 
 from .autenticacao import bootstrap_admin_por_ambiente
+from .autenticacao.google_oauth import inicializar_google_oauth
 from .autorizacao import normalizar_papel
 from .blueprints import register_blueprints
 from .cli.db import registrar_comandos_db
@@ -22,6 +23,14 @@ def _normalizar_database_url(raw_url: str) -> str:
         return raw_url.replace("postgres://", "postgresql+psycopg://", 1)
 
     return raw_url
+
+
+def _ler_bool_env(chave: str, padrao: bool = False) -> bool:
+    valor = os.getenv(chave)
+    if valor is None:
+        return padrao
+
+    return valor.strip().lower() in {"1", "true", "t", "yes", "y", "on", "sim"}
 
 
 def _montar_engine_options(database_uri: str, ambiente: str) -> dict:
@@ -54,6 +63,12 @@ def create_app(test_config: dict | None = None) -> Flask:
 
     app.config["SECRET_KEY"] = os.getenv("SECRET_KEY", "dev-secret-change-me")
     app.config["GA4_MEASUREMENT_ID"] = os.getenv("GA4_MEASUREMENT_ID", "")
+    app.config["GOOGLE_OAUTH_ENABLED"] = _ler_bool_env("GOOGLE_OAUTH_ENABLED", False)
+    app.config["GOOGLE_CLIENT_ID"] = os.getenv("GOOGLE_CLIENT_ID", "")
+    app.config["GOOGLE_CLIENT_SECRET"] = os.getenv("GOOGLE_CLIENT_SECRET", "")
+    app.config["GOOGLE_DISCOVERY_URL"] = os.getenv(
+        "GOOGLE_DISCOVERY_URL", "https://accounts.google.com/.well-known/openid-configuration"
+    )
     ambiente = os.getenv("AMBIENTE_APLICACAO", "desenvolvimento")
     database_url = os.getenv("DATABASE_URL", "")
 
@@ -65,6 +80,8 @@ def create_app(test_config: dict | None = None) -> Flask:
     app.config["SQLALCHEMY_DATABASE_URI"] = database_uri
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
     app.config["SQLALCHEMY_ENGINE_OPTIONS"] = _montar_engine_options(database_uri, ambiente)
+
+    inicializar_google_oauth(app)
 
     if test_config:
         app.config.update(test_config)
