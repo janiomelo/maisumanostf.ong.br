@@ -64,6 +64,9 @@ def test_home_renderiza_conteudo_essencial(client):
     assert 'property="og:description"' in html
     assert 'property="og:image"' in html
     assert "social-card.svg" in html
+    assert "Página de apoios (exige login)" in html
+    assert "registro de apoio está disponível" in html
+    assert "e exige login" in html
 
     cache_control = response.headers.get("Cache-Control", "")
     assert "max-age=120" in cache_control
@@ -487,6 +490,8 @@ def test_form_login_aponta_para_endpoint_de_entrada(client):
     assert response.status_code == 200
     html = response.get_data(as_text=True)
     assert '<form method="post" action="/entrar">' in html
+    assert "Quem pode acessar" in html
+    assert "Como funciona o acesso com Google" in html
     assert "Política de Privacidade" in html
     assert "Termos de Uso" in html
     assert "/wiki/estatuto-base" in html
@@ -502,6 +507,7 @@ def test_login_mostra_botao_google_quando_habilitado(client):
     html = response.get_data(as_text=True)
     assert "Entrar com Google" in html
     assert "Continuar com Google" in html
+    assert "Em produção, este é o método principal e permanece sempre ativo." in html
     assert "Usar e-mail e senha (secundário)" in html
 
 

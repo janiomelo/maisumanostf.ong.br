@@ -15,6 +15,7 @@
     <section class="login-principal" aria-label="Entrada principal">
       <h2>Entrar com Google</h2>
       <p class="login-help">Recomendado para todas as pessoas usuárias, inclusive administração.</p>
+      <p class="login-help">Em produção, este é o método principal e permanece sempre ativo.</p>
       <p>
         <a class="cta-btn" href="{{ url_for('autenticacao.iniciar_oauth_google', proximo=proximo or url_for('apoios.assinar_manifesto')) }}">Continuar com Google</a>
       </p>
@@ -42,6 +43,7 @@
     </details>
   {% else %}
     <h2>Entrar com e-mail e senha</h2>
+    <p class="login-help">Ambiente sem Google habilitado. Em produção, o login com Google é o fluxo principal.</p>
     <form method="post" action="{{ url_for('autenticacao.processar_entrada') }}">
       <input type="hidden" name="proximo" value="{{ proximo }}">
       <p>
@@ -57,6 +59,25 @@
       </p>
     </form>
   {% endif %}
+
+  <hr class="login-divider">
+
+  <section aria-label="Quem pode acessar">
+    <h2>Quem pode acessar</h2>
+    <ul>
+      <li><strong>Pessoas apoiadoras:</strong> acessam <code>/apoios/assinar</code> para registrar e remover o próprio apoio.</li>
+      <li><strong>Editoras:</strong> acessam a wiki para criar e editar conteúdo público.</li>
+      <li><strong>Administradoras:</strong> gerenciam usuários, aceites e páginas gerais no painel admin.</li>
+    </ul>
+  </section>
+
+  <section aria-label="Como funciona o acesso com Google">
+    <h2>Como funciona o acesso com Google</h2>
+    <ol>
+      <li>Clique em <strong>Continuar com Google</strong> para autenticar na conta autorizada.</li>
+      <li>Depois da autenticação, você volta automaticamente para a página que tentou acessar.</li>
+    </ol>
+  </section>
 
   {% if paginas_gerais_links.estatuto or paginas_gerais_links.politica_privacidade or paginas_gerais_links.termos_uso %}
     <hr class="login-divider">
