@@ -7,7 +7,12 @@
   --border: #d4d9e1;
   --alert: #fff3cd;
   --accent: #1f4fa3;
+  --accent-contrast: #ffffff;
   --ok: #155724;
+  --ok-contrast: #ffffff;
+  --chart-annotation-bg: rgba(255, 255, 255, .96);
+  --chart-annotation-border: rgba(120, 130, 145, .55);
+  --chart-annotation-text: #1a1a1a;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -15,12 +20,17 @@
     --bg: #101317;
     --surface: #161b22;
     --text: #e9edf3;
-    --muted: #b3bdcc;
+    --muted: #c4cfde;
     --link: #7fb3ff;
     --border: #2a3340;
     --alert: #3d3520;
-    --accent: #7fb3ff;
-    --ok: #86efac;
+    --accent: #97c2ff;
+    --accent-contrast: #0a1728;
+    --ok: #8ee7b3;
+    --ok-contrast: #072112;
+    --chart-annotation-bg: rgba(11, 18, 30, .96);
+    --chart-annotation-border: rgba(136, 165, 210, .72);
+    --chart-annotation-text: #edf4ff;
   }
 }
 
@@ -28,12 +38,17 @@
   --bg: #101317;
   --surface: #161b22;
   --text: #e9edf3;
-  --muted: #b3bdcc;
+  --muted: #c4cfde;
   --link: #7fb3ff;
   --border: #2a3340;
   --alert: #3d3520;
-  --accent: #7fb3ff;
-  --ok: #86efac;
+  --accent: #97c2ff;
+  --accent-contrast: #0a1728;
+  --ok: #8ee7b3;
+  --ok-contrast: #072112;
+  --chart-annotation-bg: rgba(11, 18, 30, .96);
+  --chart-annotation-border: rgba(136, 165, 210, .72);
+  --chart-annotation-text: #edf4ff;
 }
 
 :root[data-theme="light"] {
@@ -45,7 +60,12 @@
   --border: #d4d9e1;
   --alert: #fff3cd;
   --accent: #1f4fa3;
+  --accent-contrast: #ffffff;
   --ok: #155724;
+  --ok-contrast: #ffffff;
+  --chart-annotation-bg: rgba(255, 255, 255, .96);
+  --chart-annotation-border: rgba(120, 130, 145, .55);
+  --chart-annotation-text: #1a1a1a;
 }
 
 * { box-sizing: border-box; }
@@ -147,7 +167,7 @@ nav a {
 
 .theme-btn {
   border: 1px solid var(--border);
-  background: var(--surface);
+  background: color-mix(in srgb, var(--surface) 80%, var(--bg));
   color: var(--text);
   border-radius: 6px;
   padding: .3rem .6rem;
@@ -345,7 +365,7 @@ h2 {
   display: inline-block;
   text-decoration: none;
   border: 1px solid var(--accent);
-  color: #fff;
+  color: var(--accent-contrast);
   background: var(--accent);
   padding: .85rem 1.2rem;
   font-weight: 700;
@@ -356,6 +376,7 @@ h2 {
 .cta-btn.success {
   background: var(--ok);
   border-color: var(--ok);
+  color: var(--ok-contrast);
 }
 
 .EasyMDEContainer {
@@ -432,7 +453,7 @@ input, textarea {
 button {
   border: 1px solid var(--accent);
   background: var(--accent);
-  color: #fff;
+  color: var(--accent-contrast);
   padding: .5rem .8rem;
   cursor: pointer;
 }

@@ -43,6 +43,10 @@ function startRepresentationChart() {
   const textColor = styles.getPropertyValue('--text').trim() || '#1a1a1a';
   const mutedColor = styles.getPropertyValue('--muted').trim() || '#5a5a5a';
   const campaignColor = styles.getPropertyValue('--ok').trim() || '#155724';
+  const annotationBg = styles.getPropertyValue('--chart-annotation-bg').trim() || 'rgba(255, 255, 255, .96)';
+  const annotationBorder =
+    styles.getPropertyValue('--chart-annotation-border').trim() || 'rgba(120, 130, 145, .55)';
+  const annotationText = styles.getPropertyValue('--chart-annotation-text').trim() || textColor;
   const gridColor = 'rgba(128, 136, 149, .22)';
 
   const datasetByKey = Object.fromEntries(payload.datasets.map((item) => [item.key, item]));
@@ -79,15 +83,15 @@ function startRepresentationChart() {
         const boxX = Math.max(minLeft, Math.min(maxLeft, preferredX));
         const boxY = Math.max(chartArea.top + 6, y + offsetY - 12);
 
-        ctx.fillStyle = 'rgba(255, 255, 255, .88)';
-        ctx.strokeStyle = 'rgba(120, 130, 145, .55)';
+        ctx.fillStyle = annotationBg;
+        ctx.strokeStyle = annotationBorder;
         ctx.lineWidth = 1;
         ctx.beginPath();
         ctx.roundRect(boxX, boxY, w, h, 6);
         ctx.fill();
         ctx.stroke();
 
-        ctx.fillStyle = textColor;
+        ctx.fillStyle = annotationText;
         ctx.fillText(text, boxX + paddingX, boxY + (h / 2));
       });
 
