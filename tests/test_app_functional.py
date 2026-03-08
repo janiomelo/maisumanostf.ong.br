@@ -235,6 +235,36 @@ def test_wiki_nova_exige_autenticacao(client):
 
 
 @pytest.mark.functional
+def test_wiki_nova_nao_usa_required_no_textarea_com_easymde(client):
+    client.post(
+        "/entrar",
+        data={"email": "editor@teste.local", "senha": "123456"},
+    )
+
+    response = client.get("/wiki/nova")
+
+    assert response.status_code == 200
+    html = response.get_data(as_text=True)
+    assert '<textarea id="conteudo_markdown" name="conteudo_markdown" rows="16">' in html
+    assert 'name="conteudo_markdown" rows="16" required' not in html
+    assert "alert('Conteudo e obrigatorio.')" in html
+
+
+@pytest.mark.functional
+def test_form_wiki_nova_aponta_para_endpoint_de_criacao(client):
+    client.post(
+        "/entrar",
+        data={"email": "editor@teste.local", "senha": "123456"},
+    )
+
+    response = client.get("/wiki/nova")
+
+    assert response.status_code == 200
+    html = response.get_data(as_text=True)
+    assert '<form method="post" action="/wiki/nova">' in html
+
+
+@pytest.mark.functional
 def test_wiki_nova_cria_pagina_com_editor(client):
     client.post(
         "/entrar",
@@ -278,6 +308,36 @@ def test_wiki_nova_retorna_400_para_slug_duplicado(client):
 
 
 @pytest.mark.functional
+def test_wiki_editar_nao_usa_required_no_textarea_com_easymde(client):
+    client.post(
+        "/entrar",
+        data={"email": "editor@teste.local", "senha": "123456"},
+    )
+
+    response = client.get("/wiki/estatuto-basico-ampliado/editar")
+
+    assert response.status_code == 200
+    html = response.get_data(as_text=True)
+    assert '<textarea id="conteudo_markdown" name="conteudo_markdown" rows="16">' in html
+    assert 'name="conteudo_markdown" rows="16" required' not in html
+    assert "alert('Conteudo e obrigatorio.')" in html
+
+
+@pytest.mark.functional
+def test_form_wiki_editar_aponta_para_endpoint_de_edicao(client):
+    client.post(
+        "/entrar",
+        data={"email": "editor@teste.local", "senha": "123456"},
+    )
+
+    response = client.get("/wiki/estatuto-basico-ampliado/editar")
+
+    assert response.status_code == 200
+    html = response.get_data(as_text=True)
+    assert '<form method="post" action="/wiki/estatuto-basico-ampliado/editar">' in html
+
+
+@pytest.mark.functional
 def test_login_logout_funciona_e_renderiza_estado_no_topo(client):
     home_anonimo = client.get("/").get_data(as_text=True)
     assert "Entrar" in home_anonimo
@@ -304,6 +364,15 @@ def test_login_invalido_retorna_401(client):
     )
     assert response.status_code == 401
     assert "Credenciais invalidas" in response.get_data(as_text=True)
+
+
+@pytest.mark.functional
+def test_form_login_aponta_para_endpoint_de_entrada(client):
+    response = client.get("/entrar")
+
+    assert response.status_code == 200
+    html = response.get_data(as_text=True)
+    assert '<form method="post" action="/entrar">' in html
 
 
 @pytest.mark.functional
@@ -386,6 +455,20 @@ def test_admin_usuarios_cria_atualiza_e_desativa_usuario(client):
         desativado = Usuario.query.filter_by(id=usuario_id).first()
         assert desativado is not None
         assert desativado.ativo is False
+
+
+@pytest.mark.functional
+def test_form_admin_criar_usuario_aponta_para_endpoint_de_criacao(client):
+    client.post(
+        "/entrar",
+        data={"email": "admin@teste.local", "senha": "abc123"},
+    )
+
+    response = client.get("/admin/usuarios")
+
+    assert response.status_code == 200
+    html = response.get_data(as_text=True)
+    assert '<form method="post" action="/admin/usuarios">' in html
 
 
 @pytest.mark.functional

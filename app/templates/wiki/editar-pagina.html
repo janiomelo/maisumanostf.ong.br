@@ -24,7 +24,7 @@
     </p>
     <p>
       <label for="conteudo_markdown"><strong>Conteudo (Markdown)</strong></label><br>
-      <textarea id="conteudo_markdown" name="conteudo_markdown" rows="16" required>{{ pagina.conteudo_markdown }}</textarea>
+      <textarea id="conteudo_markdown" name="conteudo_markdown" rows="16">{{ pagina.conteudo_markdown }}</textarea>
     </p>
     <p>
       <button class="cta-btn" type="submit">Salvar pagina</button>
@@ -38,13 +38,21 @@
   <script>
     const inputMarkdown = document.getElementById('conteudo_markdown');
     if (inputMarkdown && window.EasyMDE) {
-      new EasyMDE({
+      const easyMde = new EasyMDE({
         element: inputMarkdown,
         spellChecker: false,
         status: ['lines', 'words'],
         minHeight: '320px',
         placeholder: 'Escreva em Markdown...',
         autosave: { enabled: false },
+      });
+
+      const form = inputMarkdown.closest('form');
+      form?.addEventListener('submit', (event) => {
+        if (!easyMde.value().trim()) {
+          event.preventDefault();
+          alert('Conteudo e obrigatorio.');
+        }
       });
     }
   </script>
