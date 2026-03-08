@@ -57,5 +57,22 @@
       </p>
     </form>
   {% endif %}
+
+  {% if paginas_gerais_links.estatuto or paginas_gerais_links.politica_privacidade or paginas_gerais_links.termos_uso %}
+    <hr class="login-divider">
+    <p>
+      {% if paginas_gerais_links.estatuto %}
+        <a href="{{ paginas_gerais_links.estatuto.url }}">Estatuto</a>
+      {% endif %}
+      {% if paginas_gerais_links.politica_privacidade %}
+        {% if paginas_gerais_links.estatuto %} · {% endif %}
+        <a href="{{ paginas_gerais_links.politica_privacidade.url }}">Política de Privacidade</a>
+      {% endif %}
+      {% if paginas_gerais_links.termos_uso %}
+        {% if paginas_gerais_links.estatuto or paginas_gerais_links.politica_privacidade %} · {% endif %}
+        <a href="{{ paginas_gerais_links.termos_uso.url }}">Termos de Uso</a>
+      {% endif %}
+    </p>
+  {% endif %}
 </section>
 {% endblock %}

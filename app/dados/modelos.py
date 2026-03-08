@@ -72,3 +72,17 @@ class ApoioManifesto(db.Model):
         return datetime.now(UTC)
 
     criado_em = db.Column(db.DateTime, nullable=False, default=_agora_utc)
+
+
+class ConfiguracaoPublica(db.Model):
+    __tablename__ = "configuracoes_publicas"
+
+    id = db.Column(db.Integer, primary_key=True)
+    chave = db.Column(db.String(120), unique=True, nullable=False, index=True)
+    valor = db.Column(db.String(255), nullable=False, default="")
+
+    @staticmethod
+    def _agora_utc() -> datetime:
+        return datetime.now(UTC)
+
+    atualizado_em = db.Column(db.DateTime, nullable=False, default=_agora_utc, onupdate=_agora_utc)

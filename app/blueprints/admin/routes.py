@@ -8,6 +8,14 @@ from app.autenticacao import (
 	listar_usuarios,
 )
 from app.autorizacao import PAPEIS_VALIDOS, exigir_permissao
+from app.paginas_gerais import (
+	CHAVE_WIKI_ESTATUTO,
+	CHAVE_WIKI_POLITICA_PRIVACIDADE,
+	CHAVE_WIKI_TERMOS_USO,
+	atualizar_configuracoes_paginas_gerais,
+	carregar_configuracoes_paginas_gerais,
+)
+from app.dados.modelos import WikiPagina
 
 admin_bp = Blueprint("admin", __name__, url_prefix="/admin")
 
@@ -55,6 +63,55 @@ def painel_admin():
 	return render_template("admin/painel.html", aba_admin_ativa="painel")
 
 
+@admin_bp.get("/paginas-gerais")
+@exigir_permissao("admin", "gerenciar")
+def paginas_gerais_admin():
+	config = carregar_configuracoes_paginas_gerais()
+	paginas_wiki = WikiPagina.query.order_by(WikiPagina.slug.asc()).all()
+	return render_template(
+		"admin/paginas-gerais.html",
+		aba_admin_ativa="paginas-gerais",
+		erro=None,
+		sucesso=None,
+		paginas_wiki=paginas_wiki,
+		chave_estatuto=CHAVE_WIKI_ESTATUTO,
+		chave_politica=CHAVE_WIKI_POLITICA_PRIVACIDADE,
+		chave_termos=CHAVE_WIKI_TERMOS_USO,
+		config=config,
+	)
+
+
+@admin_bp.post("/paginas-gerais")
+@exigir_permissao("admin", "gerenciar")
+def salvar_paginas_gerais_admin():
+	estatuto_slug = request.form.get(CHAVE_WIKI_ESTATUTO, "")
+	politica_slug = request.form.get(CHAVE_WIKI_POLITICA_PRIVACIDADE, "")
+	termos_slug = request.form.get(CHAVE_WIKI_TERMOS_USO, "")
+
+	try:
+		atualizar_configuracoes_paginas_gerais(
+			estatuto_slug=estatuto_slug,
+			politica_slug=politica_slug,
+			termos_slug=termos_slug,
+		)
+	except ValueError as exc:
+		config = carregar_configuracoes_paginas_gerais()
+		paginas_wiki = WikiPagina.query.order_by(WikiPagina.slug.asc()).all()
+		return render_template(
+			"admin/paginas-gerais.html",
+			aba_admin_ativa="paginas-gerais",
+			erro=str(exc),
+			sucesso=None,
+			paginas_wiki=paginas_wiki,
+			chave_estatuto=CHAVE_WIKI_ESTATUTO,
+			chave_politica=CHAVE_WIKI_POLITICA_PRIVACIDADE,
+			chave_termos=CHAVE_WIKI_TERMOS_USO,
+			config=config,
+		), 400
+
+	return redirect(url_for("admin.paginas_gerais_admin"))
+
+
 @admin_bp.post("/usuarios")
 @exigir_permissao("admin", "gerenciar")
 def criar_usuario_admin():
@@ -68,6 +125,7 @@ def criar_usuario_admin():
 		usuarios = listar_usuarios()
 		return render_template(
 			"admin/usuarios.html",
+			aba_admin_ativa="usuarios",
 			usuarios=usuarios,
 			papeis_validos=PAPEIS_VALIDOS,
 			erro=str(exc),
@@ -93,6 +151,7 @@ def atualizar_usuario_admin(usuario_id: int):
 		erro = "Não é permitido remover seu próprio papel de admin."
 		return render_template(
 			"admin/usuarios.html",
+			aba_admin_ativa="usuarios",
 			usuarios=usuarios,
 			papeis_validos=PAPEIS_VALIDOS,
 			erro=erro,
@@ -115,6 +174,7 @@ def desativar_usuario_admin(usuario_id: int):
 		erro = "Não é permitido desativar seu próprio usuário admin."
 		return render_template(
 			"admin/usuarios.html",
+			aba_admin_ativa="usuarios",
 			usuarios=usuarios,
 			papeis_validos=PAPEIS_VALIDOS,
 			erro=erro,

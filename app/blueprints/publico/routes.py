@@ -8,8 +8,16 @@ from app.domain.campanha import (
     get_setting,
     vacancy_dates,
 )
+from app.paginas_gerais import carregar_links_paginas_gerais
 
 publico_bp = Blueprint("main", __name__)
+
+
+@publico_bp.app_context_processor
+def injetar_paginas_gerais() -> dict[str, object]:
+    return {
+        "paginas_gerais_links": carregar_links_paginas_gerais(),
+    }
 
 
 @publico_bp.get("/")
@@ -75,13 +83,22 @@ def sitemap_xml():
         for pagina in WikiPagina.query.order_by(WikiPagina.slug.asc()).all()
     ]
 
+    paginas_gerais = carregar_links_paginas_gerais()
+    extras_configurados = [
+        url_for("wiki.pagina_wiki", slug=item["slug"], _external=True)
+        for item in paginas_gerais.values()
+        if item is not None
+    ]
+
     paginas = [
         url_for("main.home", _external=True),
         url_for("wiki.indice_wiki", _external=True),
         url_for("apoios.assinar_manifesto", _external=True),
         url_for("autenticacao.entrar", _external=True),
+        *extras_configurados,
         *paginas_wiki,
     ]
+    paginas = list(dict.fromkeys(paginas))
 
     linhas = [
         '<?xml version="1.0" encoding="UTF-8"?>',

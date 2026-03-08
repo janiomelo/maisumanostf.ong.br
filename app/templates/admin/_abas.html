@@ -1,5 +1,6 @@
 <nav class="admin-tabs" aria-label="Navegação administrativa">
   <a class="{% if aba_admin_ativa == 'painel' %}ativa{% endif %}" href="{{ url_for('admin.painel_admin') }}">Painel</a>
+  <a class="{% if aba_admin_ativa == 'paginas-gerais' %}ativa{% endif %}" href="{{ url_for('admin.paginas_gerais_admin') }}">Páginas gerais</a>
   <a class="{% if aba_admin_ativa == 'usuarios' %}ativa{% endif %}" href="{{ url_for('admin.listar_usuarios_admin') }}">Usuários</a>
   <a class="{% if aba_admin_ativa == 'apoios' %}ativa{% endif %}" href="{{ url_for('admin.listar_apoios_admin_route') }}">Aceites</a>
 </nav>

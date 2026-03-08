@@ -1,0 +1,52 @@
+{% extends "publico/base.html" %}
+
+{% block title %}Páginas Gerais | Mais Uma no STF{% endblock %}
+
+{% block content %}
+<section class="learn-more-box" id="admin-paginas-gerais" aria-label="Configuração de páginas gerais">
+  <h1>Páginas Gerais</h1>
+  <p>Associe quais páginas da wiki representam Estatuto, Política de Privacidade e Termos de Uso.</p>
+
+  {% include "admin/_abas.html" %}
+
+  {% if erro %}
+    <p class="civic-alert"><strong>Erro:</strong> {{ erro }}</p>
+  {% endif %}
+
+  <form method="post" action="{{ url_for('admin.salvar_paginas_gerais_admin') }}">
+    <p>
+      <label for="{{ chave_estatuto }}"><strong>Estatuto</strong></label><br>
+      <select id="{{ chave_estatuto }}" name="{{ chave_estatuto }}" style="max-width:620px;">
+        <option value="">Não exibir</option>
+        {% for pagina in paginas_wiki %}
+          <option value="{{ pagina.slug }}" {% if config[chave_estatuto] == pagina.slug %}selected{% endif %}>{{ pagina.titulo }} ({{ pagina.slug }})</option>
+        {% endfor %}
+      </select>
+    </p>
+
+    <p>
+      <label for="{{ chave_politica }}"><strong>Política de Privacidade</strong></label><br>
+      <select id="{{ chave_politica }}" name="{{ chave_politica }}" style="max-width:620px;">
+        <option value="">Não exibir</option>
+        {% for pagina in paginas_wiki %}
+          <option value="{{ pagina.slug }}" {% if config[chave_politica] == pagina.slug %}selected{% endif %}>{{ pagina.titulo }} ({{ pagina.slug }})</option>
+        {% endfor %}
+      </select>
+    </p>
+
+    <p>
+      <label for="{{ chave_termos }}"><strong>Termos de Uso</strong></label><br>
+      <select id="{{ chave_termos }}" name="{{ chave_termos }}" style="max-width:620px;">
+        <option value="">Não exibir</option>
+        {% for pagina in paginas_wiki %}
+          <option value="{{ pagina.slug }}" {% if config[chave_termos] == pagina.slug %}selected{% endif %}>{{ pagina.titulo }} ({{ pagina.slug }})</option>
+        {% endfor %}
+      </select>
+    </p>
+
+    <p>
+      <button class="cta-btn" type="submit">Salvar configuração</button>
+    </p>
+  </form>
+</section>
+{% endblock %}

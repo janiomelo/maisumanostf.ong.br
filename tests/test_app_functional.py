@@ -32,6 +32,7 @@ def test_create_app_registra_rotas_principais():
     assert "/wiki/<slug>" in rotas
     assert "/wiki/<slug>/editar" in rotas
     assert "/admin" in rotas
+    assert "/admin/paginas-gerais" in rotas
     assert "/admin/usuarios" in rotas
     assert "/admin/usuarios/<int:usuario_id>/atualizar" in rotas
     assert "/admin/usuarios/<int:usuario_id>/desativar" in rotas
@@ -152,6 +153,9 @@ def test_sitemap_xml_lista_paginas_publicas(client):
     assert "<loc>http://localhost/apoios/assinar</loc>" in body
     assert "<loc>http://localhost/entrar</loc>" in body
     assert "<loc>http://localhost/wiki/estatuto-basico-ampliado</loc>" in body
+    assert "<loc>http://localhost/wiki/estatuto-base</loc>" in body
+    assert "<loc>http://localhost/wiki/politica-de-privacidade</loc>" in body
+    assert "<loc>http://localhost/wiki/termos-de-uso</loc>" in body
 
 
 @pytest.mark.functional
@@ -432,6 +436,9 @@ def test_form_login_aponta_para_endpoint_de_entrada(client):
     assert response.status_code == 200
     html = response.get_data(as_text=True)
     assert '<form method="post" action="/entrar">' in html
+    assert "Política de Privacidade" in html
+    assert "Termos de Uso" in html
+    assert "/wiki/estatuto-base" in html
 
 
 @pytest.mark.functional
@@ -817,8 +824,68 @@ def test_admin_painel_renderiza_links_e_botao_no_header_para_admin(client):
     assert response.status_code == 200
     html = response.get_data(as_text=True)
     assert "Painel de Administração" in html
+    assert 'href="/admin/paginas-gerais"' in html
     assert 'href="/admin/usuarios"' in html
     assert 'href="/admin/apoios"' in html
+
+
+@pytest.mark.functional
+def test_admin_paginas_gerais_exige_autenticacao(client):
+    response = client.get("/admin/paginas-gerais")
+    assert response.status_code == 302
+    assert "/entrar?proximo=/admin/paginas-gerais" in response.headers["Location"]
+
+
+@pytest.mark.functional
+def test_admin_paginas_gerais_salva_configuracoes(client):
+    client.post(
+        "/entrar",
+        data={"email": "admin@teste.local", "senha": "abc123"},
+    )
+
+    response = client.post(
+        "/admin/paginas-gerais",
+        data={
+            "wiki_slug_estatuto": "estatuto-base",
+            "wiki_slug_politica_privacidade": "politica-de-privacidade",
+            "wiki_slug_termos_uso": "termos-de-uso",
+        },
+        follow_redirects=True,
+    )
+
+    assert response.status_code == 200
+
+    home = client.get("/")
+    html = home.get_data(as_text=True)
+    assert "/wiki/estatuto-base" in html
+    assert "/wiki/politica-de-privacidade" in html
+    assert "/wiki/termos-de-uso" in html
+
+
+@pytest.mark.functional
+def test_admin_paginas_gerais_permite_ocultar_links(client):
+    client.post(
+        "/entrar",
+        data={"email": "admin@teste.local", "senha": "abc123"},
+    )
+
+    response = client.post(
+        "/admin/paginas-gerais",
+        data={
+            "wiki_slug_estatuto": "",
+            "wiki_slug_politica_privacidade": "",
+            "wiki_slug_termos_uso": "",
+        },
+        follow_redirects=True,
+    )
+
+    assert response.status_code == 200
+
+    home = client.get("/")
+    html = home.get_data(as_text=True)
+    assert "Política de Privacidade" not in html
+    assert "Termos de Uso" not in html
+    assert "Estatuto</a>" not in html
 
 
 @pytest.mark.functional

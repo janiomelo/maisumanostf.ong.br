@@ -83,9 +83,19 @@
       <section>
         <h3>Mapa do Site</h3>
         <ul>
-          <li><a href="{{ url_for('main.home', _anchor='manifesto') }}">Manifesto</a></li>
-          <li><a href="{{ url_for('main.home', _anchor='dados') }}">Dados</a></li>
-          <li><a href="{{ url_for('main.home', _anchor='sobre') }}">Sobre</a></li>
+          <li><a href="{{ url_for('main.home', _anchor='manifesto') }}">Ato 1: Manifesto</a></li>
+          <li><a href="{{ url_for('main.home', _anchor='dados') }}">Ato 2: Dados</a></li>
+          <li><a href="{{ url_for('main.home', _anchor='referencias') }}">Ato 3: Evidências</a></li>
+          <li><a href="{{ url_for('main.home', _anchor='sobre') }}">Ato 4: Compromisso</a></li>
+          {% if paginas_gerais_links.estatuto %}
+            <li><a href="{{ paginas_gerais_links.estatuto.url }}">Estatuto</a></li>
+          {% endif %}
+          {% if paginas_gerais_links.politica_privacidade %}
+            <li><a href="{{ paginas_gerais_links.politica_privacidade.url }}">Política de Privacidade</a></li>
+          {% endif %}
+          {% if paginas_gerais_links.termos_uso %}
+            <li><a href="{{ paginas_gerais_links.termos_uso.url }}">Termos de Uso</a></li>
+          {% endif %}
         </ul>
       </section>
 
