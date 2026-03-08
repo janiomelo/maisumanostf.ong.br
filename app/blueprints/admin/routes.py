@@ -1,5 +1,6 @@
 from flask import Blueprint, abort, g, redirect, render_template, request, url_for
 
+from app.apoios import listar_apoios_admin, remover_apoio_admin
 from app.autenticacao import (
 	atualizar_usuario,
 	criar_usuario,
@@ -9,6 +10,30 @@ from app.autenticacao import (
 from app.autorizacao import PAPEIS_VALIDOS, exigir_permissao
 
 admin_bp = Blueprint("admin", __name__, url_prefix="/admin")
+
+
+def _filtros_apoios_da_requisicao() -> dict[str, str | int]:
+	termo = request.values.get("termo", "").strip()
+	data_inicial = request.values.get("data_inicial", "").strip()
+	data_final = request.values.get("data_final", "").strip()
+
+	try:
+		pagina = int(request.values.get("pagina", "1"))
+	except ValueError:
+		pagina = 1
+
+	try:
+		por_pagina = int(request.values.get("por_pagina", "20"))
+	except ValueError:
+		por_pagina = 20
+
+	return {
+		"termo": termo,
+		"data_inicial": data_inicial,
+		"data_final": data_final,
+		"pagina": pagina,
+		"por_pagina": por_pagina,
+	}
 
 
 @admin_bp.get("/usuarios")
@@ -100,3 +125,49 @@ def ativar_usuario_admin(usuario_id: int):
 		abort(404)
 
 	return redirect(url_for("admin.listar_usuarios_admin"))
+
+
+@admin_bp.get("/apoios")
+@exigir_permissao("admin", "gerenciar")
+def listar_apoios_admin_route():
+	filtros = _filtros_apoios_da_requisicao()
+	resultado = listar_apoios_admin(
+		termo=str(filtros["termo"]),
+		data_inicial=str(filtros["data_inicial"]),
+		data_final=str(filtros["data_final"]),
+		pagina=int(filtros["pagina"]),
+		por_pagina=int(filtros["por_pagina"]),
+	)
+
+	return render_template(
+		"admin/apoios.html",
+		apoios=resultado.apoios,
+		total_geral=resultado.total_geral,
+		total_filtrado=resultado.total_filtrado,
+		pagina=resultado.pagina,
+		por_pagina=resultado.por_pagina,
+		total_paginas=resultado.total_paginas,
+		termo=str(filtros["termo"]),
+		data_inicial=str(filtros["data_inicial"]),
+		data_final=str(filtros["data_final"]),
+	)
+
+
+@admin_bp.post("/apoios/<int:apoio_id>/remover")
+@exigir_permissao("admin", "gerenciar")
+def remover_apoio_admin_route(apoio_id: int):
+	filtros = _filtros_apoios_da_requisicao()
+	removido = remover_apoio_admin(apoio_id)
+	if not removido:
+		abort(404)
+
+	return redirect(
+		url_for(
+			"admin.listar_apoios_admin_route",
+			termo=filtros["termo"],
+			data_inicial=filtros["data_inicial"],
+			data_final=filtros["data_final"],
+			pagina=filtros["pagina"],
+			por_pagina=filtros["por_pagina"],
+		)
+	)

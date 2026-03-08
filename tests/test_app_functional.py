@@ -1,9 +1,11 @@
 import re
+from datetime import UTC, datetime, timedelta
 
 import pytest
 from flask import redirect
 
 from app import create_app
+from app.dados.base import db
 from app.dados.modelos import ApoioManifesto, Usuario
 import app.blueprints.autenticacao.routes as rotas_autenticacao
 import app.blueprints.apoios.routes as rotas_apoios
@@ -33,6 +35,8 @@ def test_create_app_registra_rotas_principais():
     assert "/admin/usuarios/<int:usuario_id>/atualizar" in rotas
     assert "/admin/usuarios/<int:usuario_id>/desativar" in rotas
     assert "/admin/usuarios/<int:usuario_id>/ativar" in rotas
+    assert "/admin/apoios" in rotas
+    assert "/admin/apoios/<int:apoio_id>/remover" in rotas
     assert "/apoios/assinar" in rotas
     assert "/apoios/remover" in rotas
 
@@ -974,3 +978,113 @@ def test_admin_usuarios_bloqueia_autodesativacao(client):
         admin = Usuario.query.filter_by(id=admin_id).first()
         assert admin is not None
         assert admin.ativo is True
+
+
+@pytest.mark.functional
+def test_admin_apoios_exige_autenticacao(client):
+    response = client.get("/admin/apoios")
+    assert response.status_code == 302
+    assert "/entrar?proximo=/admin/apoios" in response.headers["Location"]
+
+
+@pytest.mark.functional
+def test_admin_apoios_bloqueia_editor(client):
+    client.post(
+        "/entrar",
+        data={"email": "editor@teste.local", "senha": "123456"},
+    )
+
+    response = client.get("/admin/apoios")
+    assert response.status_code == 403
+
+
+@pytest.mark.functional
+def test_admin_apoios_lista_totaliza_e_filtra_por_termo_e_data(client):
+    client.post(
+        "/entrar",
+        data={"email": "admin@teste.local", "senha": "abc123"},
+    )
+
+    with client.application.app_context():
+        agora = datetime.now(UTC).replace(tzinfo=None)
+        db.session.add_all(
+            [
+                ApoioManifesto(email="ana@teste.local", nome="Ana", criado_em=agora - timedelta(days=2)),
+                ApoioManifesto(email="bia@teste.local", nome="Bia", criado_em=agora - timedelta(days=1)),
+                ApoioManifesto(email="carla@teste.local", nome="Carla", criado_em=agora),
+            ]
+        )
+        db.session.commit()
+
+    response = client.get("/admin/apoios?termo=bia&data_inicial=2000-01-01&data_final=2100-01-01")
+
+    assert response.status_code == 200
+    html = response.get_data(as_text=True)
+    assert "Admin de Apoios" in html
+    assert "Total geral de apoios: <strong>3</strong>" in html
+    assert "Total filtrado: <strong>1</strong>" in html
+    assert "bia@teste.local" in html
+    assert "ana@teste.local" not in html
+
+
+@pytest.mark.functional
+def test_admin_apoios_paginacao_funciona(client):
+    client.post(
+        "/entrar",
+        data={"email": "admin@teste.local", "senha": "abc123"},
+    )
+
+    with client.application.app_context():
+        agora = datetime.now(UTC).replace(tzinfo=None)
+        for i in range(1, 26):
+            db.session.add(
+                ApoioManifesto(
+                    email=f"apoio{i:02d}@teste.local",
+                    nome=f"Pessoa {i:02d}",
+                    criado_em=agora + timedelta(seconds=i),
+                )
+            )
+        db.session.commit()
+
+    response = client.get("/admin/apoios?por_pagina=10&pagina=2")
+
+    assert response.status_code == 200
+    html = response.get_data(as_text=True)
+    assert "Página 2 de 3" in html
+    assert "Próxima página" in html
+    assert "Página anterior" in html
+
+
+@pytest.mark.functional
+def test_admin_apoios_remove_registro(client):
+    client.post(
+        "/entrar",
+        data={"email": "admin@teste.local", "senha": "abc123"},
+    )
+
+    with client.application.app_context():
+        apoio = ApoioManifesto(email="remover@teste.local", nome="Remover")
+        db.session.add(apoio)
+        db.session.commit()
+        apoio_id = apoio.id
+
+    response = client.post(
+        f"/admin/apoios/{apoio_id}/remover",
+        data={"termo": "", "data_inicial": "", "data_final": "", "pagina": "1", "por_pagina": "20"},
+        follow_redirects=True,
+    )
+
+    assert response.status_code == 200
+    with client.application.app_context():
+        assert ApoioManifesto.query.filter_by(id=apoio_id).first() is None
+
+
+@pytest.mark.functional
+def test_admin_apoios_remover_inexistente_retorna_404(client):
+    client.post(
+        "/entrar",
+        data={"email": "admin@teste.local", "senha": "abc123"},
+    )
+
+    response = client.post("/admin/apoios/999999/remover")
+    assert response.status_code == 404

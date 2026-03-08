@@ -1,0 +1,91 @@
+{% extends "publico/base.html" %}
+
+{% block title %}Admin de Apoios | Mais Uma no STF{% endblock %}
+
+{% block content %}
+<section class="learn-more-box" id="admin-apoios" aria-label="Gestão interna de apoios">
+  <h1>Admin de Apoios</h1>
+  <p>Consulta paginada e remoção de apoios registrados, sem edição.</p>
+
+  <h2>Filtros</h2>
+  <form method="get" action="{{ url_for('admin.listar_apoios_admin_route') }}">
+    <p>
+      <label for="termo"><strong>E-mail ou nome</strong></label><br>
+      <input id="termo" name="termo" type="text" value="{{ termo }}" style="max-width:620px;">
+    </p>
+    <p>
+      <label for="data_inicial"><strong>Data inicial</strong></label><br>
+      <input id="data_inicial" name="data_inicial" type="date" value="{{ data_inicial }}" style="max-width:220px;">
+    </p>
+    <p>
+      <label for="data_final"><strong>Data final</strong></label><br>
+      <input id="data_final" name="data_final" type="date" value="{{ data_final }}" style="max-width:220px;">
+    </p>
+    <p>
+      <label for="por_pagina"><strong>Itens por página</strong></label><br>
+      <input id="por_pagina" name="por_pagina" type="number" min="1" max="100" value="{{ por_pagina }}" style="max-width:120px;">
+    </p>
+    <p>
+      <button class="cta-btn" type="submit">Filtrar</button>
+    </p>
+  </form>
+
+  <h2>Totais</h2>
+  <p>Total geral de apoios: <strong>{{ total_geral }}</strong></p>
+  <p>Total filtrado: <strong>{{ total_filtrado }}</strong></p>
+
+  <h2>Lista de apoios</h2>
+  <p>Página {{ pagina }} de {{ total_paginas }}</p>
+
+  <div style="overflow:auto;">
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Protocolo</th>
+          <th>E-mail</th>
+          <th>Nome público</th>
+          <th>Data</th>
+          <th>Ações</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for apoio in apoios %}
+          <tr>
+            <td>{{ apoio.id }}</td>
+            <td>{{ apoio.protocolo[:12] }}</td>
+            <td>{{ apoio.email }}</td>
+            <td>{{ apoio.nome or 'não informado' }}</td>
+            <td>{{ apoio.criado_em.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+            <td>
+              <form method="post" action="{{ url_for('admin.remover_apoio_admin_route', apoio_id=apoio.id) }}">
+                <input type="hidden" name="termo" value="{{ termo }}">
+                <input type="hidden" name="data_inicial" value="{{ data_inicial }}">
+                <input type="hidden" name="data_final" value="{{ data_final }}">
+                <input type="hidden" name="pagina" value="{{ pagina }}">
+                <input type="hidden" name="por_pagina" value="{{ por_pagina }}">
+                <button class="theme-btn" type="submit">Excluir</button>
+              </form>
+            </td>
+          </tr>
+        {% else %}
+          <tr>
+            <td colspan="6">Nenhum apoio encontrado.</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  {% if pagina > 1 %}
+    <p>
+      <a href="{{ url_for('admin.listar_apoios_admin_route', termo=termo, data_inicial=data_inicial, data_final=data_final, por_pagina=por_pagina, pagina=pagina-1) }}">Página anterior</a>
+    </p>
+  {% endif %}
+  {% if pagina < total_paginas %}
+    <p>
+      <a href="{{ url_for('admin.listar_apoios_admin_route', termo=termo, data_inicial=data_inicial, data_final=data_final, por_pagina=por_pagina, pagina=pagina+1) }}">Próxima página</a>
+    </p>
+  {% endif %}
+</section>
+{% endblock %}
