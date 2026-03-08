@@ -1,8 +1,10 @@
 from flask import Blueprint, current_app, g, redirect, render_template, request, url_for
+from sqlalchemy import func
 
 from app.comunicacao import ErroClienteResend, enviar_email_confirmacao_apoio
 from app.dados.base import db
 from app.dados.modelos import ApoioManifesto
+from app.dados.protocolo import abreviar_protocolo
 
 apoios_bp = Blueprint("apoios", __name__, url_prefix="/apoios")
 
@@ -55,19 +57,26 @@ def salvar_assinatura_manifesto():
 	apoio = ApoioManifesto(email=email, nome=nome)
 	db.session.add(apoio)
 	db.session.commit()
-	_despachar_email_confirmacao(email=email, nome=nome, ordem_apoio=apoio.id)
+	total_apoios_ativos = db.session.query(func.count(ApoioManifesto.id)).scalar() or 0
+	_despachar_email_confirmacao(
+		email=email,
+		nome=nome,
+		protocolo_publico=abreviar_protocolo(apoio.protocolo),
+		total_apoios_ativos=int(total_apoios_ativos),
+	)
 
 	sucesso = "Assinatura registrada com sucesso. Obrigada por apoiar o manifesto!"
 	return _render_assinar(erro=None, sucesso=sucesso, nome=nome, apoio_registrado=True)
 
 
-def _despachar_email_confirmacao(*, email: str, nome: str, ordem_apoio: int) -> None:
+def _despachar_email_confirmacao(*, email: str, nome: str, protocolo_publico: str, total_apoios_ativos: int) -> None:
 	try:
 		enviar_email_confirmacao_apoio(
 			config=current_app.config,
 			destinatario=email,
 			nome_publico=nome,
-			ordem_apoio=ordem_apoio,
+			protocolo_publico=protocolo_publico,
+			total_apoios_ativos=total_apoios_ativos,
 			url_site=request.url_root,
 		)
 	except (ErroClienteResend, RuntimeError, ValueError) as exc:

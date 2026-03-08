@@ -14,7 +14,8 @@ def enviar_email_confirmacao_apoio(
     config: Mapping[str, object],
     destinatario: str,
     nome_publico: str,
-    ordem_apoio: int,
+    protocolo_publico: str,
+    total_apoios_ativos: int,
     url_site: str,
 ) -> str | None:
     api_key = str(config.get("RESEND_API_KEY", "") or "").strip()
@@ -29,7 +30,8 @@ def enviar_email_confirmacao_apoio(
     html = montar_html_confirmacao_apoio(
         destinatario=destinatario,
         nome_publico=nome_publico,
-        ordem_apoio=ordem_apoio,
+        protocolo_publico=protocolo_publico,
+        total_apoios_ativos=total_apoios_ativos,
         canal_contato=canal_contato,
         site_publico=site_publico,
     )
@@ -48,7 +50,8 @@ def montar_html_confirmacao_apoio(
     *,
     destinatario: str,
     nome_publico: str,
-    ordem_apoio: int,
+    protocolo_publico: str,
+    total_apoios_ativos: int,
     canal_contato: str,
     site_publico: str,
 ) -> str:
@@ -59,7 +62,8 @@ def montar_html_confirmacao_apoio(
         "emails/confirmacao-apoio.html",
         destinatario=destinatario,
         nome_publico=nome_publico_formatado,
-        ordem_apoio=ordem_apoio,
+        protocolo_publico=protocolo_publico,
+        total_apoios_ativos=total_apoios_ativos,
         canal_contato=canal_contato,
         url_apoios=url_apoios,
     )

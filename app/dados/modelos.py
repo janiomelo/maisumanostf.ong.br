@@ -2,6 +2,8 @@ from datetime import UTC, datetime
 
 from werkzeug.security import check_password_hash, generate_password_hash
 
+from .protocolo import gerar_protocolo_apoio
+
 from .base import db
 
 
@@ -61,6 +63,7 @@ class ApoioManifesto(db.Model):
     __tablename__ = "apoios_manifesto"
 
     id = db.Column(db.Integer, primary_key=True)
+    protocolo = db.Column(db.String(64), unique=True, nullable=False, index=True, default=gerar_protocolo_apoio)
     email = db.Column(db.String(255), unique=True, nullable=False, index=True)
     nome = db.Column(db.String(255), nullable=False)
 

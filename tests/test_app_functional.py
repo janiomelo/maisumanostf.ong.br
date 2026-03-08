@@ -629,12 +629,13 @@ def test_apoios_assinar_dispara_email_confirmacao(client, monkeypatch):
 
     chamadas: list[dict[str, object]] = []
 
-    def envio_falso(*, config, destinatario, nome_publico, ordem_apoio, url_site):
+    def envio_falso(*, config, destinatario, nome_publico, protocolo_publico, total_apoios_ativos, url_site):
         chamadas.append(
             {
                 "destinatario": destinatario,
                 "nome_publico": nome_publico,
-                "ordem_apoio": ordem_apoio,
+                "protocolo_publico": protocolo_publico,
+                "total_apoios_ativos": total_apoios_ativos,
                 "url_site": url_site,
             }
         )
@@ -648,7 +649,8 @@ def test_apoios_assinar_dispara_email_confirmacao(client, monkeypatch):
     assert len(chamadas) == 1
     assert chamadas[0]["destinatario"] == "editor@teste.local"
     assert chamadas[0]["nome_publico"] == "Editora Teste"
-    assert chamadas[0]["ordem_apoio"] == 1
+    assert len(str(chamadas[0]["protocolo_publico"])) == 12
+    assert chamadas[0]["total_apoios_ativos"] == 1
     assert chamadas[0]["url_site"].startswith("http://")
 
 
@@ -659,7 +661,7 @@ def test_apoios_assinar_nao_falha_quando_email_confirmacao_erro(client, monkeypa
         data={"email": "editor@teste.local", "senha": "123456"},
     )
 
-    def envio_com_falha(*, config, destinatario, nome_publico, ordem_apoio, url_site):
+    def envio_com_falha(*, config, destinatario, nome_publico, protocolo_publico, total_apoios_ativos, url_site):
         raise RuntimeError("falha simulada")
 
     monkeypatch.setattr(rotas_apoios, "enviar_email_confirmacao_apoio", envio_com_falha)

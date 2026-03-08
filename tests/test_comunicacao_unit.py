@@ -12,13 +12,15 @@ def test_montar_html_confirmacao_apoio_tem_texto_obrigatorio(app_instance):
         html = montar_html_confirmacao_apoio(
             destinatario="apoiadora@teste.local",
             nome_publico="Apoiadora Teste",
-            ordem_apoio=5,
+            protocolo_publico="abc123def456",
+            total_apoios_ativos=5,
             canal_contato="contato@maisumanostf.ong.br",
             site_publico="https://maisumanostf.ong.br",
         )
 
     assert "Obrigada por apoiar o manifesto" in html
-    assert "Seu apoio é o <strong>5º</strong>" in html
+    assert "Protocolo do seu apoio: <strong>abc123def456</strong>" in html
+    assert "Total de apoios ativos no momento do registro: <strong>5</strong>" in html
     assert "Escopo de aceite" in html
     assert "exclusivo para o conteúdo deste e-mail" in html
     assert "contato@maisumanostf.ong.br" in html
@@ -40,7 +42,8 @@ def test_enviar_email_confirmacao_apoio_retorna_none_sem_configuracao_resend(mon
         config={"RESEND_API_KEY": "", "RESEND_FROM_EMAIL": ""},
         destinatario="apoiadora@teste.local",
         nome_publico="",
-        ordem_apoio=1,
+        protocolo_publico="abc123def456",
+        total_apoios_ativos=1,
         url_site="https://maisumanostf.ong.br",
     )
 
@@ -69,7 +72,8 @@ def test_enviar_email_confirmacao_apoio_encaminha_payload_para_resend(app_instan
             },
             destinatario="apoiadora@teste.local",
             nome_publico="Nome Publico",
-            ordem_apoio=7,
+            protocolo_publico="abc123def456",
+            total_apoios_ativos=7,
             url_site="http://ignorado.local",
         )
 
@@ -80,7 +84,8 @@ def test_enviar_email_confirmacao_apoio_encaminha_payload_para_resend(app_instan
     assert captura["assunto"] == ASSUNTO_CONFIRMACAO_APOIO
     assert captura["reply_to"] == "resposta@maisumanostf.ong.br"
     assert "Escopo de aceite" in captura["html"]
-    assert "<strong>7º</strong>" in captura["html"]
+    assert "abc123def456" in captura["html"]
+    assert "<strong>7</strong>" in captura["html"]
 
 
 @pytest.mark.unit
