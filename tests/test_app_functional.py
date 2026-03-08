@@ -196,6 +196,7 @@ def test_wiki_estatuto_publico(client):
     assert "Estatuto Basico Ampliado" in html
     assert "Escopo inicial" in html
     assert "<ul>" in html
+    assert '<a href="/wiki/">Wiki</a> /' in html
 
 
 @pytest.mark.functional
@@ -286,6 +287,7 @@ def test_wiki_gestao_lista_paginas_para_editor(client):
     assert response.status_code == 200
     html = response.get_data(as_text=True)
     assert "Gestão da Wiki" in html
+    assert '<a href="/wiki/">Wiki</a> / Gestão' in html
     assert "Criar nova página" in html
     assert "Estatuto Basico Ampliado" in html
 
@@ -308,6 +310,7 @@ def test_wiki_nova_nao_usa_required_no_textarea_com_easymde(client):
 
     assert response.status_code == 200
     html = response.get_data(as_text=True)
+    assert '<a href="/wiki/">Wiki</a> / Nova página' in html
     assert '<textarea id="conteudo_markdown" name="conteudo_markdown" rows="16">' in html
     assert 'name="conteudo_markdown" rows="16" required' not in html
     assert "alert('Conteúdo é obrigatório.')" in html
@@ -381,6 +384,7 @@ def test_wiki_editar_nao_usa_required_no_textarea_com_easymde(client):
 
     assert response.status_code == 200
     html = response.get_data(as_text=True)
+    assert '<a href="/wiki/">Wiki</a> / Editar' in html
     assert '<textarea id="conteudo_markdown" name="conteudo_markdown" rows="16">' in html
     assert 'name="conteudo_markdown" rows="16" required' not in html
     assert "alert('Conteúdo é obrigatório.')" in html

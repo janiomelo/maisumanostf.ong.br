@@ -4,6 +4,7 @@
 
 {% block content %}
 <section class="learn-more-box" id="wiki-pagina" aria-label="Página da Wiki">
+  <p><a href="{{ url_for('wiki.indice_wiki') }}">Wiki</a> / {{ pagina.titulo }}</p>
   <h1>{{ pagina.titulo }}</h1>
 
   {{ pagina.conteudo_html | safe }}
