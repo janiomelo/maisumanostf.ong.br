@@ -4,6 +4,20 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{% block title %}Mais Uma no STF{% endblock %}</title>
+  <meta name="description" content="Campanha por representatividade de Mulheres no STF, com dados públicos e registro de apoios para preservar o mínimo civilizatório.">
+  <meta name="robots" content="index, follow">
+  <meta property="og:locale" content="pt_BR">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Mais Uma no STF">
+  <meta property="og:title" content="Mais Uma no STF">
+  <meta property="og:description" content="Representatividade de Mulheres no STF: diagnóstico, risco atual e compromisso mínimo para a próxima vaga.">
+  <meta property="og:url" content="{{ request.base_url }}">
+  <meta property="og:image" content="{{ url_for('static', filename='social-card.svg', _external=True) }}">
+  <meta property="og:image:alt" content="Mais Uma no STF - campanha por representatividade feminina no Supremo Tribunal Federal">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Mais Uma no STF">
+  <meta name="twitter:description" content="Representatividade de Mulheres no STF: diagnóstico, risco atual e compromisso mínimo para a próxima vaga.">
+  <meta name="twitter:image" content="{{ url_for('static', filename='social-card.svg', _external=True) }}">
   {% if config.get("GA4_MEASUREMENT_ID") %}
   <!-- Google tag (gtag.js) -->
   <script async src="https://www.googletagmanager.com/gtag/js?id={{ config.get('GA4_MEASUREMENT_ID') }}"></script>

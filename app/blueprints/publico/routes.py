@@ -56,3 +56,11 @@ def api_countdown_legado():
     response.headers["Link"] = '</api/contagem-regressiva>; rel="successor-version"'
     response.headers["Content-Language"] = "pt-BR"
     return response
+
+
+@publico_bp.get("/robots.txt")
+def robots_txt():
+    conteudo = "User-agent: *\nAllow: /\n"
+    response = make_response(conteudo)
+    response.mimetype = "text/plain"
+    return response

@@ -14,6 +14,7 @@ def test_create_app_registra_rotas_principais():
     rotas = {rule.rule for rule in app.url_map.iter_rules()}
 
     assert "/" in rotas
+    assert "/robots.txt" in rotas
     assert "/api/contagem-regressiva" in rotas
     assert "/api/countdown" in rotas
     assert "/entrar" in rotas
@@ -47,6 +48,12 @@ def test_home_renderiza_conteudo_essencial(client):
     assert "id=\"dados\"" in html
     assert "id=\"transparencia\"" in html
     assert "chart.umd.min.js" in html
+    assert 'meta name="description"' in html
+    assert "Mulheres no STF" in html
+    assert 'property="og:title"' in html
+    assert 'property="og:description"' in html
+    assert 'property="og:image"' in html
+    assert "social-card.svg" in html
 
     cache_control = response.headers.get("Cache-Control", "")
     assert "max-age=120" in cache_control
@@ -100,6 +107,27 @@ def test_static_main_js_disponivel(client):
     body = response.get_data(as_text=True)
     assert "function startCountdown()" in body
     assert "dataset.alvo" in body
+
+
+@pytest.mark.functional
+def test_static_social_card_disponivel(client):
+    response = client.get("/static/social-card.svg")
+
+    assert response.status_code == 200
+    body = response.get_data(as_text=True)
+    assert "<svg" in body
+    assert "Mais Uma no STF" in body
+
+
+@pytest.mark.functional
+def test_robots_txt_permite_indexacao_total(client):
+    response = client.get("/robots.txt")
+
+    assert response.status_code == 200
+    assert response.mimetype == "text/plain"
+    body = response.get_data(as_text=True)
+    assert "User-agent: *" in body
+    assert "Allow: /" in body
 
 
 @pytest.mark.functional
