@@ -195,6 +195,7 @@ def test_wiki_estatuto_publico(client):
     html = response.get_data(as_text=True)
     assert "Estatuto Basico Ampliado" in html
     assert "Escopo inicial" in html
+    assert "<ul>" in html
 
 
 @pytest.mark.functional

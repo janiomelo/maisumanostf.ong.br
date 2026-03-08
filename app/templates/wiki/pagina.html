@@ -6,13 +6,7 @@
 <section class="learn-more-box" id="wiki-pagina" aria-label="Página da Wiki">
   <h1>{{ pagina.titulo }}</h1>
 
-  {% for bloco in pagina.blocos %}
-    {% if bloco.tipo == "h2" %}
-      <h2>{{ bloco.texto }}</h2>
-    {% else %}
-      <p>{{ bloco.texto }}</p>
-    {% endif %}
-  {% endfor %}
+  {{ pagina.conteudo_html | safe }}
 
   <p><a href="{{ url_for('wiki.editar_pagina_wiki', slug=pagina.slug) }}">Editar esta página (acesso autenticado)</a></p>
 </section>

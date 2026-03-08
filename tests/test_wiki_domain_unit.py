@@ -41,7 +41,49 @@ def test_carregar_pagina_wiki_retorna_blocos_do_banco(app_instance):
         assert pagina["slug"] == "estatuto-teste"
         assert pagina["titulo"] == "Estatuto Teste"
         assert any(bloco["tipo"] == "h2" and bloco["texto"] == "Secao" for bloco in pagina["blocos"])
+        assert "<h2>Secao</h2>" in pagina["conteudo_html"]
         assert "conteudo_markdown" in pagina
+
+
+@pytest.mark.unit
+def test_carregar_pagina_wiki_renderiza_markdown_com_lista_e_link(app_instance):
+    with app_instance.app_context():
+        db.session.add(
+            WikiPagina(
+                slug="markdown-avancado",
+                titulo="Markdown Avancado",
+                conteudo_markdown="# Markdown Avancado\n\nTexto com **destaque** e [link](https://example.com).\n\n- Item 1\n- Item 2",
+            )
+        )
+        db.session.commit()
+
+        pagina = wiki.carregar_pagina_wiki("markdown-avancado")
+
+        assert pagina is not None
+        html = pagina["conteudo_html"]
+        assert "<strong>destaque</strong>" in html
+        assert '<a href="https://example.com" rel="noopener">link</a>' in html
+        assert "<ul><li>Item 1</li><li>Item 2</li></ul>" in html
+
+
+@pytest.mark.unit
+def test_carregar_pagina_wiki_escapa_html_perigoso(app_instance):
+    with app_instance.app_context():
+        db.session.add(
+            WikiPagina(
+                slug="html-perigoso",
+                titulo="HTML Perigoso",
+                conteudo_markdown="# HTML Perigoso\n\n<script>alert('x')</script>",
+            )
+        )
+        db.session.commit()
+
+        pagina = wiki.carregar_pagina_wiki("html-perigoso")
+
+        assert pagina is not None
+        html = pagina["conteudo_html"]
+        assert "<script>" not in html
+        assert "&lt;script&gt;alert(&#x27;x&#x27;)&lt;/script&gt;" in html
 
 
 @pytest.mark.unit

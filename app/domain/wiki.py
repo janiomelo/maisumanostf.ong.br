@@ -1,5 +1,7 @@
 import re
 import unicodedata
+from html import escape
+from urllib.parse import urlparse
 
 from app.dados import WikiPagina, db
 
@@ -43,6 +45,111 @@ def _parse_conteudo_markdown(raw: str) -> tuple[str, list[dict[str, str]]]:
     return titulo, blocos
 
 
+def _url_markdown_valida(url: str) -> bool:
+    url_limpa = url.strip()
+    if url_limpa.startswith("/"):
+        return True
+
+    parsed = urlparse(url_limpa)
+    return parsed.scheme in {"http", "https", "mailto"}
+
+
+def _render_inline_markdown(texto: str) -> str:
+    escaped = escape(texto)
+
+    def repl_link(match: re.Match[str]) -> str:
+        label = match.group(1)
+        url = match.group(2).strip()
+        if not _url_markdown_valida(url):
+            return escape(match.group(0))
+
+        return f'<a href="{escape(url, quote=True)}" rel="noopener">{label}</a>'
+
+    escaped = re.sub(r"\[([^\]]+)\]\(([^\)]+)\)", repl_link, escaped)
+    escaped = re.sub(r"\*\*(.+?)\*\*", r"<strong>\1</strong>", escaped)
+    escaped = re.sub(r"\*(.+?)\*", r"<em>\1</em>", escaped)
+    escaped = re.sub(r"`([^`]+)`", r"<code>\1</code>", escaped)
+    return escaped
+
+
+def _render_markdown_html(raw: str) -> str:
+    linhas = [item.rstrip("\n") for item in raw.splitlines()]
+    html: list[str] = []
+    i = 0
+    pulou_titulo_h1 = False
+
+    while i < len(linhas):
+        linha = linhas[i].rstrip()
+        linha_stripped = linha.strip()
+
+        if not linha_stripped:
+            i += 1
+            continue
+
+        if linha_stripped.startswith("# ") and not pulou_titulo_h1:
+            pulou_titulo_h1 = True
+            i += 1
+            continue
+
+        if linha_stripped.startswith("```"):
+            i += 1
+            buffer_codigo: list[str] = []
+            while i < len(linhas) and not linhas[i].strip().startswith("```"):
+                buffer_codigo.append(linhas[i])
+                i += 1
+            if i < len(linhas):
+                i += 1
+            html.append(f"<pre><code>{escape(chr(10).join(buffer_codigo))}</code></pre>")
+            continue
+
+        if linha_stripped.startswith("### "):
+            html.append(f"<h3>{_render_inline_markdown(linha_stripped[4:].strip())}</h3>")
+            i += 1
+            continue
+
+        if linha_stripped.startswith("## "):
+            html.append(f"<h2>{_render_inline_markdown(linha_stripped[3:].strip())}</h2>")
+            i += 1
+            continue
+
+        if re.match(r"^[-*+]\s+", linha_stripped):
+            itens: list[str] = []
+            while i < len(linhas) and re.match(r"^[-*+]\s+", linhas[i].strip()):
+                item = re.sub(r"^[-*+]\s+", "", linhas[i].strip())
+                itens.append(f"<li>{_render_inline_markdown(item)}</li>")
+                i += 1
+            html.append("<ul>" + "".join(itens) + "</ul>")
+            continue
+
+        if re.match(r"^\d+\.\s+", linha_stripped):
+            itens: list[str] = []
+            while i < len(linhas) and re.match(r"^\d+\.\s+", linhas[i].strip()):
+                item = re.sub(r"^\d+\.\s+", "", linhas[i].strip())
+                itens.append(f"<li>{_render_inline_markdown(item)}</li>")
+                i += 1
+            html.append("<ol>" + "".join(itens) + "</ol>")
+            continue
+
+        buffer_paragrafo = [linha_stripped]
+        i += 1
+        while i < len(linhas):
+            prox = linhas[i].strip()
+            if not prox:
+                i += 1
+                break
+            if prox.startswith(("## ", "### ", "```")):
+                break
+            if re.match(r"^[-*+]\s+", prox) or re.match(r"^\d+\.\s+", prox):
+                break
+            buffer_paragrafo.append(prox)
+            i += 1
+
+        texto = " ".join(buffer_paragrafo)
+        html.append(f"<p>{_render_inline_markdown(texto)}</p>")
+
+    return "\n".join(html)
+
+
 def listar_paginas_wiki() -> list[dict[str, str]]:
     paginas_db = WikiPagina.query.order_by(WikiPagina.slug.asc()).all()
 
@@ -68,6 +175,7 @@ def carregar_pagina_wiki(slug: str) -> dict | None:
         "slug": pagina.slug,
         "titulo": pagina.titulo or titulo,
         "blocos": blocos,
+        "conteudo_html": _render_markdown_html(pagina.conteudo_markdown),
         "conteudo_markdown": pagina.conteudo_markdown,
     }
 
