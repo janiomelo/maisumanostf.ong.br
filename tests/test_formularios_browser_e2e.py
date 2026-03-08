@@ -40,7 +40,7 @@ def test_formularios_login_e_wiki_funcionam_no_navegador(servidor_http_local):
             page.goto(f"{servidor_http_local}/entrar", wait_until="networkidle")
             page.fill("#email", "editor@teste.local")
             page.fill("#senha", "123456")
-            page.click("button[type='submit']")
+            page.locator("form[action$='/entrar'] button[type='submit']").click()
 
             page.wait_for_url("**/wiki/")
             assert "Wiki da Campanha" in page.content()
@@ -52,7 +52,7 @@ def test_formularios_login_e_wiki_funcionam_no_navegador(servidor_http_local):
             # EasyMDE usa CodeMirror; o input real ocorre no editor renderizado.
             page.click(".CodeMirror")
             page.keyboard.type("# Pagina Criada via Browser E2E\n\nConteudo enviado pelo navegador.")
-            page.click("button[type='submit']")
+            page.locator("form[action$='/wiki/nova'] button[type='submit']").click()
 
             page.wait_for_url("**/wiki/pagina-criada-via-browser-e2e")
             html = page.content()
