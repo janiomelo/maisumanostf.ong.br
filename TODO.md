@@ -3,7 +3,7 @@
 ## Fase 2 — Coleta pública (com autenticação)
 
 - [ ] Definir provedor de autenticação (Google + e-mail mágico)
-- [ ] Implementar modelo de usuários e sessões
+- [x] Implementar modelo de usuários e sessões
 - [ ] Criar fluxo de assinatura autenticada
 - [ ] Registrar consentimento e política de privacidade
 
@@ -16,7 +16,7 @@
 ## Fase 4 — Persistência e painel
 
 - [ ] Escolher banco de dados para produção
-- [ ] Implementar migrations
+- [x] Implementar migrations
 - [ ] Criar painel administrativo para datas de vagas e conteúdo
 - [ ] Auditoria de alterações no painel
 
@@ -29,6 +29,6 @@
 
 ## Fase 6 — Métricas e operação
 
-- [ ] Instrumentar analytics de campanha
+- [x] Instrumentar analytics de campanha (GA4 básico)
 - [ ] Monitorar disponibilidade e erro (APM/logging)
 - [ ] Definir checklist de release e rollback

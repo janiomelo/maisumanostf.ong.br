@@ -38,7 +38,7 @@ def create_app(test_config: dict | None = None) -> Flask:
     app = Flask(__name__)
 
     app.config["SECRET_KEY"] = os.getenv("SECRET_KEY", "dev-secret-change-me")
-    app.config["GA4_MEASUREMENT_ID"] = os.getenv("GA4_MEASUREMENT_ID", "G-2S44NRWYMM")
+    app.config["GA4_MEASUREMENT_ID"] = os.getenv("GA4_MEASUREMENT_ID", "")
     ambiente = os.getenv("AMBIENTE_APLICACAO", "desenvolvimento")
     database_url = os.getenv("DATABASE_URL", "")
 

@@ -51,6 +51,7 @@ As variáveis da home ficam no `.env`:
 - `VACANCY_FUX_DATE` (YYYY-MM-DD)
 - `VACANCY_CARMEN_DATE` (YYYY-MM-DD)
 - `VACANCY_GILMAR_DATE` (YYYY-MM-DD)
+- `GA4_MEASUREMENT_ID` (opcional; ex.: `G-XXXXXXXXXX`)
 
 Variáveis de autenticação inicial (sessão):
 
