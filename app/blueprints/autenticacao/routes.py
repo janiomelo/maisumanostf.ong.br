@@ -22,6 +22,14 @@ def _destino_seguro(destino: str) -> str:
     return url_for("wiki.indice_wiki")
 
 
+def _obter_callback_oauth_google() -> str:
+    callback_configurada = str(current_app.config.get("GOOGLE_REDIRECT_URI", "")).strip()
+    if callback_configurada:
+        return callback_configurada
+
+    return url_for("autenticacao.callback_oauth_google", _external=True)
+
+
 @autenticacao_bp.get("/entrar")
 def entrar():
     return render_template("autenticacao/entrar.html", erro=None, proximo=request.args.get("proximo", ""))
@@ -60,7 +68,7 @@ def iniciar_oauth_google():
 
     try:
         cliente = obter_cliente_google()
-        callback_url = url_for("autenticacao.callback_oauth_google", _external=True)
+        callback_url = _obter_callback_oauth_google()
         return cliente.authorize_redirect(callback_url, prompt="select_account")
     except GoogleOAuthError:
         current_app.logger.exception("Cliente OAuth Google nao inicializado")

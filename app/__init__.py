@@ -66,6 +66,7 @@ def create_app(test_config: dict | None = None) -> Flask:
     app.config["GOOGLE_OAUTH_ENABLED"] = _ler_bool_env("GOOGLE_OAUTH_ENABLED", False)
     app.config["GOOGLE_CLIENT_ID"] = os.getenv("GOOGLE_CLIENT_ID", "")
     app.config["GOOGLE_CLIENT_SECRET"] = os.getenv("GOOGLE_CLIENT_SECRET", "")
+    app.config["GOOGLE_REDIRECT_URI"] = os.getenv("GOOGLE_REDIRECT_URI", "").strip()
     app.config["GOOGLE_DISCOVERY_URL"] = os.getenv(
         "GOOGLE_DISCOVERY_URL", "https://accounts.google.com/.well-known/openid-configuration"
     )

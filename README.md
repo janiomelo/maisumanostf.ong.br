@@ -71,7 +71,14 @@ Variáveis opcionais para login com Google (OAuth):
 - `GOOGLE_OAUTH_ENABLED` (`true` ou `false`)
 - `GOOGLE_CLIENT_ID`
 - `GOOGLE_CLIENT_SECRET`
+- `GOOGLE_REDIRECT_URI` (URL absoluta de callback em producao; ex.: `https://maisumanostf.ong.br/auth/google/callback`)
 - `GOOGLE_DISCOVERY_URL` (padrão Google)
+
+Importante em producao (erro `redirect_uri_mismatch`):
+
+- cadastre no Google Cloud exatamente a mesma URL usada em `GOOGLE_REDIRECT_URI`;
+- inclua variacoes necessarias (`www` e sem `www`) apenas se realmente usadas;
+- garanta esquema `https`.
 
 Variável opcional de conexão com banco (PostgreSQL):
 

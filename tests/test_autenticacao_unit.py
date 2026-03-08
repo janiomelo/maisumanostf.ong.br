@@ -222,6 +222,50 @@ def test_oauth_google_iniciar_retorna_mensagem_amigavel_quando_cliente_nao_inici
 
 
 @pytest.mark.functional
+def test_oauth_google_iniciar_usa_redirect_uri_configurada(client, monkeypatch):
+    client.application.config["GOOGLE_OAUTH_ENABLED"] = True
+    client.application.config["GOOGLE_CLIENT_ID"] = "id"
+    client.application.config["GOOGLE_CLIENT_SECRET"] = "secret"
+    client.application.config["GOOGLE_REDIRECT_URI"] = "https://maisumanostf.ong.br/auth/google/callback"
+
+    class ClienteGoogleFalso:
+        @staticmethod
+        def authorize_redirect(callback_url, prompt=None):
+            assert callback_url == "https://maisumanostf.ong.br/auth/google/callback"
+            assert prompt == "select_account"
+            return "ok"
+
+    monkeypatch.setattr(rotas_autenticacao, "obter_cliente_google", lambda: ClienteGoogleFalso())
+
+    response = client.get("/auth/google/iniciar")
+
+    assert response.status_code == 200
+    assert response.get_data(as_text=True) == "ok"
+
+
+@pytest.mark.functional
+def test_oauth_google_iniciar_usa_callback_externa_quando_redirect_uri_nao_configurada(client, monkeypatch):
+    client.application.config["GOOGLE_OAUTH_ENABLED"] = True
+    client.application.config["GOOGLE_CLIENT_ID"] = "id"
+    client.application.config["GOOGLE_CLIENT_SECRET"] = "secret"
+    client.application.config["GOOGLE_REDIRECT_URI"] = ""
+
+    class ClienteGoogleFalso:
+        @staticmethod
+        def authorize_redirect(callback_url, prompt=None):
+            assert callback_url.endswith("/auth/google/callback")
+            assert callback_url.startswith("http")
+            return "ok"
+
+    monkeypatch.setattr(rotas_autenticacao, "obter_cliente_google", lambda: ClienteGoogleFalso())
+
+    response = client.get("/auth/google/iniciar")
+
+    assert response.status_code == 200
+    assert response.get_data(as_text=True) == "ok"
+
+
+@pytest.mark.functional
 def test_oauth_google_callback_retorna_400_quando_troca_codigo_falha(client, monkeypatch):
     monkeypatch.setattr(
         rotas_autenticacao,
