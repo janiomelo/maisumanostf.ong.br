@@ -388,6 +388,8 @@ def test_login_mostra_botao_google_quando_habilitado(client):
     assert response.status_code == 200
     html = response.get_data(as_text=True)
     assert "Entrar com Google" in html
+    assert "Continuar com Google" in html
+    assert "Usar e-mail e senha (secundario)" in html
 
 
 @pytest.mark.functional

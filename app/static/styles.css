@@ -410,6 +410,37 @@ h2 {
   color: var(--text);
 }
 
+.login-principal h2 {
+  margin-bottom: .35rem;
+}
+
+.login-help {
+  color: var(--muted);
+  margin-top: 0;
+}
+
+.login-divider {
+  border: 0;
+  border-top: 1px solid var(--border);
+  margin: 1rem 0;
+}
+
+.login-secundario {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: .7rem .8rem;
+  background: color-mix(in srgb, var(--surface) 90%, var(--bg));
+}
+
+.login-secundario summary {
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.login-secundario[open] summary {
+  margin-bottom: .55rem;
+}
+
 .wiki {
   margin: 2rem 0;
   display: grid;

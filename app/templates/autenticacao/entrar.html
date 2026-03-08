@@ -11,26 +11,51 @@
     <p class="civic-alert"><strong>Erro:</strong> {{ erro }}</p>
   {% endif %}
 
-  <form method="post" action="{{ url_for('autenticacao.processar_entrada') }}">
-    <input type="hidden" name="proximo" value="{{ proximo }}">
-    <p>
-      <label for="email"><strong>E-mail</strong></label><br>
-      <input id="email" name="email" type="email" autocomplete="username" required style="width:100%;max-width:480px;">
-    </p>
-    <p>
-      <label for="senha"><strong>Senha</strong></label><br>
-      <input id="senha" name="senha" type="password" autocomplete="current-password" required style="width:100%;max-width:480px;">
-    </p>
-    <p>
-      <button class="cta-btn" type="submit">Entrar</button>
-    </p>
-  </form>
-
   {% if config.get('GOOGLE_OAUTH_ENABLED') %}
-    <hr>
-    <p>
-      <a class="cta-btn" href="{{ url_for('autenticacao.iniciar_oauth_google', proximo=proximo or url_for('apoios.assinar_manifesto')) }}">Entrar com Google</a>
-    </p>
+    <section class="login-principal" aria-label="Entrada principal">
+      <h2>Entrar com Google</h2>
+      <p class="login-help">Recomendado para todas as pessoas usuarias, inclusive administracao.</p>
+      <p>
+        <a class="cta-btn" href="{{ url_for('autenticacao.iniciar_oauth_google', proximo=proximo or url_for('apoios.assinar_manifesto')) }}">Continuar com Google</a>
+      </p>
+    </section>
+
+    <hr class="login-divider">
+
+    <details class="login-secundario">
+      <summary>Usar e-mail e senha (secundario)</summary>
+      <p class="login-help">Metodo legado temporario enquanto outras integracoes sao preparadas.</p>
+      <form method="post" action="{{ url_for('autenticacao.processar_entrada') }}">
+        <input type="hidden" name="proximo" value="{{ proximo }}">
+        <p>
+          <label for="email"><strong>E-mail</strong></label><br>
+          <input id="email" name="email" type="email" autocomplete="username" required style="width:100%;max-width:480px;">
+        </p>
+        <p>
+          <label for="senha"><strong>Senha</strong></label><br>
+          <input id="senha" name="senha" type="password" autocomplete="current-password" required style="width:100%;max-width:480px;">
+        </p>
+        <p>
+          <button class="theme-btn" type="submit">Entrar com e-mail e senha</button>
+        </p>
+      </form>
+    </details>
+  {% else %}
+    <h2>Entrar com e-mail e senha</h2>
+    <form method="post" action="{{ url_for('autenticacao.processar_entrada') }}">
+      <input type="hidden" name="proximo" value="{{ proximo }}">
+      <p>
+        <label for="email"><strong>E-mail</strong></label><br>
+        <input id="email" name="email" type="email" autocomplete="username" required style="width:100%;max-width:480px;">
+      </p>
+      <p>
+        <label for="senha"><strong>Senha</strong></label><br>
+        <input id="senha" name="senha" type="password" autocomplete="current-password" required style="width:100%;max-width:480px;">
+      </p>
+      <p>
+        <button class="cta-btn" type="submit">Entrar</button>
+      </p>
+    </form>
   {% endif %}
 </section>
 {% endblock %}
