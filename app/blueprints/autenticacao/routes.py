@@ -1,6 +1,11 @@
-from flask import Blueprint, g, redirect, render_template, request, url_for
+from flask import Blueprint, current_app, g, redirect, render_template, request, url_for
 
-from app.autenticacao import autenticar, limpar_sessao_usuario, registrar_sessao_usuario
+from app.autenticacao import (
+    BancoIndisponivelError,
+    autenticar,
+    limpar_sessao_usuario,
+    registrar_sessao_usuario,
+)
 
 autenticacao_bp = Blueprint("autenticacao", __name__)
 
@@ -23,7 +28,13 @@ def processar_entrada():
     senha = request.form.get("senha", "")
     proximo = request.form.get("proximo", "")
 
-    usuario = autenticar(email, senha)
+    try:
+        usuario = autenticar(email, senha)
+    except BancoIndisponivelError:
+        current_app.logger.exception("Falha de conexao com banco durante login")
+        erro = "Servico temporariamente indisponivel. Tente novamente em instantes."
+        return render_template("autenticacao/entrar.html", erro=erro, proximo=proximo), 503
+
     if not usuario:
         erro = "Credenciais invalidas. Verifique e tente novamente."
         return render_template("autenticacao/entrar.html", erro=erro, proximo=proximo), 401

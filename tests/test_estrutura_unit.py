@@ -91,3 +91,20 @@ def test_factory_aplica_migracoes_automaticas_em_producao(monkeypatch, tmp_path)
     create_app()
 
     assert chamadas == ["producao"]
+
+
+@pytest.mark.unit
+def test_factory_define_engine_options_para_postgres(monkeypatch):
+    monkeypatch.setenv("AMBIENTE_APLICACAO", "producao")
+    monkeypatch.setenv("DATABASE_URL", "postgres://user:pass@db:5432/app")
+    monkeypatch.setenv("DB_POOL_RECYCLE_SECONDS", "180")
+
+    monkeypatch.setattr(app_module, "_aplicar_migracoes_em_producao", lambda app, ambiente: None)
+
+    app = create_app()
+
+    assert app.config["SQLALCHEMY_DATABASE_URI"].startswith("postgresql+psycopg://")
+    opcoes = app.config["SQLALCHEMY_ENGINE_OPTIONS"]
+    assert opcoes["pool_pre_ping"] is True
+    assert opcoes["pool_recycle"] == 180
+    assert opcoes["pool_use_lifo"] is True

@@ -24,6 +24,21 @@ def _normalizar_database_url(raw_url: str) -> str:
     return raw_url
 
 
+def _montar_engine_options(database_uri: str, ambiente: str) -> dict:
+    if not database_uri.startswith("postgresql+psycopg://"):
+        return {}
+
+    opcoes = {
+        "pool_pre_ping": True,
+        "pool_recycle": int(os.getenv("DB_POOL_RECYCLE_SECONDS", "300")),
+    }
+
+    if ambiente == "producao":
+        opcoes["pool_use_lifo"] = True
+
+    return opcoes
+
+
 def _aplicar_migracoes_em_producao(app: Flask, ambiente: str) -> None:
     if app.config.get("TESTING", False):
         return
@@ -46,8 +61,10 @@ def create_app(test_config: dict | None = None) -> Flask:
         raise RuntimeError("DATABASE_URL obrigatoria em producao")
 
     fallback = "sqlite:////app/data/app.db"
-    app.config["SQLALCHEMY_DATABASE_URI"] = _normalizar_database_url(database_url or fallback)
+    database_uri = _normalizar_database_url(database_url or fallback)
+    app.config["SQLALCHEMY_DATABASE_URI"] = database_uri
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+    app.config["SQLALCHEMY_ENGINE_OPTIONS"] = _montar_engine_options(database_uri, ambiente)
 
     if test_config:
         app.config.update(test_config)

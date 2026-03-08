@@ -3,6 +3,7 @@ from sqlalchemy.exc import OperationalError
 
 import app.autenticacao.servico as servico_autenticacao
 from app.autenticacao.servico import (
+    BancoIndisponivelError,
     atualizar_usuario,
     autenticar,
     bootstrap_admin_por_ambiente,
@@ -12,6 +13,7 @@ from app.autenticacao.servico import (
     registrar_sessao_usuario,
 )
 from app.dados.modelos import Usuario
+import app.blueprints.autenticacao.routes as rotas_autenticacao
 
 
 @pytest.mark.unit
@@ -33,6 +35,43 @@ def test_autenticar_retorna_none_quando_senha_ou_email_invalidos(app_instance):
         assert autenticar("editor3@teste.local", "") is None
         assert autenticar("editor3@teste.local", "errada") is None
         assert autenticar("inexistente@teste.local", "123456") is None
+
+
+@pytest.mark.unit
+def test_autenticar_dispara_erro_de_banco_indisponivel_quando_operational_error(app_instance, monkeypatch):
+    class QueryQueFalha:
+        def filter_by(self, **kwargs):
+            return self
+
+        def first(self):
+            raise OperationalError("select", {}, Exception("falha simulada"))
+
+    with app_instance.app_context():
+        query_original = servico_autenticacao.Usuario.query
+        monkeypatch.setattr(servico_autenticacao.Usuario, "query", QueryQueFalha(), raising=False)
+
+        with pytest.raises(BancoIndisponivelError):
+            autenticar("editor@teste.local", "123456")
+
+        monkeypatch.setattr(servico_autenticacao.Usuario, "query", query_original, raising=False)
+
+
+@pytest.mark.unit
+def test_login_retorna_503_quando_banco_esta_indisponivel(client, monkeypatch):
+    monkeypatch.setattr(
+        rotas_autenticacao,
+        "autenticar",
+        lambda email, senha: (_ for _ in ()).throw(BancoIndisponivelError("falha")),
+    )
+
+    response = client.post(
+        "/entrar",
+        data={"email": "editor@teste.local", "senha": "123456"},
+    )
+
+    assert response.status_code == 503
+    html = response.get_data(as_text=True)
+    assert "Servico temporariamente indisponivel" in html
 
 
 @pytest.mark.unit

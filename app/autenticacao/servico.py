@@ -9,12 +9,21 @@ from app.dados.base import db
 from app.dados.modelos import Usuario
 
 
+class BancoIndisponivelError(RuntimeError):
+    pass
+
+
 def autenticar(email: str, senha: str) -> dict[str, str] | None:
     email_normalizado = email.strip().lower()
     if not email_normalizado or not senha:
         return None
 
-    usuario = Usuario.query.filter_by(email=email_normalizado, ativo=True).first()
+    try:
+        usuario = Usuario.query.filter_by(email=email_normalizado, ativo=True).first()
+    except OperationalError as exc:
+        db.session.rollback()
+        raise BancoIndisponivelError("Falha temporaria de conexao com banco.") from exc
+
     if not usuario or not usuario.validar_senha(senha):
         return None
 

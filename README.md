@@ -59,6 +59,11 @@ Variáveis de autenticação inicial (sessão):
 - Esta configuração cria apenas o admin bootstrap no ambiente
 - Demais usuários devem ser cadastrados no banco (ex.: `make user-create ...`)
 
+Variável opcional de conexão com banco (PostgreSQL):
+
+- `DB_POOL_RECYCLE_SECONDS` (padrão `300`)
+- Ajuda a renovar conexões antigas e reduzir falhas transitórias de SSL em produção
+
 Após alterar variáveis, rode `make restart`.
 
 Em `AMBIENTE_APLICACAO=producao`, a aplicação executa `db upgrade` automaticamente no boot.

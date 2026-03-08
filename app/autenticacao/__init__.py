@@ -1,4 +1,5 @@
 from .servico import (
+    BancoIndisponivelError,
     atualizar_usuario,
     autenticar,
     bootstrap_admin_por_ambiente,
@@ -11,6 +12,7 @@ from .servico import (
 )
 
 __all__ = [
+    "BancoIndisponivelError",
     "atualizar_usuario",
     "autenticar",
     "bootstrap_admin_por_ambiente",
