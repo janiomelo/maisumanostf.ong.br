@@ -145,6 +145,20 @@ def test_robots_txt_bloqueia_areas_restritas(client):
 
 
 @pytest.mark.functional
+def test_home_envia_headers_de_seguranca(client):
+    response = client.get("/")
+
+    assert response.status_code == 200
+    assert response.headers.get("X-Frame-Options") == "SAMEORIGIN"
+    assert response.headers.get("X-Content-Type-Options") == "nosniff"
+    assert response.headers.get("Referrer-Policy") == "strict-origin-when-cross-origin"
+
+    csp = response.headers.get("Content-Security-Policy", "")
+    assert "default-src 'self'" in csp
+    assert "object-src 'none'" in csp
+
+
+@pytest.mark.functional
 def test_sitemap_xml_lista_paginas_publicas(client):
     response = client.get("/sitemap.xml")
 

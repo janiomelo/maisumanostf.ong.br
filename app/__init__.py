@@ -1,6 +1,7 @@
 import os
 
 from flask import Flask, g, session
+from flask_talisman import Talisman
 
 from .autenticacao import bootstrap_admin_por_ambiente
 from .autenticacao.google_oauth import inicializar_google_oauth
@@ -58,6 +59,37 @@ def _aplicar_migracoes_em_producao(app: Flask, ambiente: str) -> None:
     aplicar_upgrade_seguro(app)
 
 
+def _configurar_headers_seguranca(app: Flask, ambiente: str) -> None:
+    if not app.config.get("SECURITY_HEADERS_ENABLED", True):
+        return
+
+    force_https_padrao = ambiente == "producao" and not app.config.get("TESTING", False)
+    force_https = app.config.get("TALISMAN_FORCE_HTTPS", force_https_padrao)
+
+    politica_csp = app.config.get(
+        "TALISMAN_CSP",
+        {
+            "default-src": ["'self'"],
+            "img-src": ["'self'", "data:", "https:"],
+            "script-src": ["'self'", "'unsafe-inline'", "https://www.googletagmanager.com", "https://cdn.jsdelivr.net"],
+            "style-src": ["'self'", "'unsafe-inline'", "https://cdn.jsdelivr.net"],
+            "connect-src": ["'self'", "https://www.google-analytics.com"],
+            "font-src": ["'self'", "data:"],
+            "object-src": ["'none'"],
+            "base-uri": ["'self'"],
+            "frame-ancestors": ["'none'"],
+        },
+    )
+
+    Talisman(
+        app,
+        force_https=force_https,
+        strict_transport_security=ambiente == "producao",
+        session_cookie_secure=force_https,
+        content_security_policy=politica_csp,
+    )
+
+
 def create_app(test_config: dict | None = None) -> Flask:
     app = Flask(__name__)
 
@@ -92,6 +124,9 @@ def create_app(test_config: dict | None = None) -> Flask:
     if test_config:
         app.config.update(test_config)
 
+    app.config.setdefault("SECURITY_HEADERS_ENABLED", _ler_bool_env("SECURITY_HEADERS_ENABLED", True))
+    app.config.setdefault("TALISMAN_FORCE_HTTPS", _ler_bool_env("TALISMAN_FORCE_HTTPS", ambiente == "producao"))
+
     @app.before_request
     def carregar_contexto_autenticacao() -> None:
         g.usuario_email = session.get("usuario_email")
@@ -107,5 +142,6 @@ def create_app(test_config: dict | None = None) -> Flask:
             bootstrap_admin_por_ambiente()
 
     register_blueprints(app)
+    _configurar_headers_seguranca(app, ambiente)
 
     return app
