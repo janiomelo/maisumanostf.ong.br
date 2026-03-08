@@ -80,6 +80,14 @@ Importante em producao (erro `redirect_uri_mismatch`):
 - inclua variacoes necessarias (`www` e sem `www`) apenas se realmente usadas;
 - garanta esquema `https`.
 
+Variáveis opcionais para envio de e-mail de confirmacao de apoio (Resend):
+
+- `RESEND_API_KEY`
+- `RESEND_FROM_EMAIL` (ex.: `Mais Uma no STF <apoios@maisumanostf.ong.br>`)
+- `RESEND_REPLY_TO` (opcional)
+- `APOIOS_EMAIL_CONTATO` (canal de contato exibido no e-mail)
+- `SITE_URL` (URL pública base usada no corpo do e-mail)
+
 Variável opcional de conexão com banco (PostgreSQL):
 
 - `DB_POOL_RECYCLE_SECONDS` (padrão `300`)

@@ -6,6 +6,7 @@ from flask import redirect
 from app import create_app
 from app.dados.modelos import ApoioManifesto, Usuario
 import app.blueprints.autenticacao.routes as rotas_autenticacao
+import app.blueprints.apoios.routes as rotas_apoios
 
 
 @pytest.mark.functional
@@ -607,6 +608,61 @@ def test_apoios_assinar_persiste_no_banco(client):
         "/entrar",
         data={"email": "editor@teste.local", "senha": "123456"},
     )
+
+    response = client.post("/apoios/assinar", data={"nome": "Editora Teste"})
+
+    assert response.status_code == 200
+    assert "Assinatura registrada com sucesso" in response.get_data(as_text=True)
+
+    with client.application.app_context():
+        assinatura = ApoioManifesto.query.filter_by(email="editor@teste.local").first()
+        assert assinatura is not None
+        assert assinatura.nome == "Editora Teste"
+
+
+@pytest.mark.functional
+def test_apoios_assinar_dispara_email_confirmacao(client, monkeypatch):
+    client.post(
+        "/entrar",
+        data={"email": "editor@teste.local", "senha": "123456"},
+    )
+
+    chamadas: list[dict[str, object]] = []
+
+    def envio_falso(*, config, destinatario, nome_publico, ordem_apoio, url_site):
+        chamadas.append(
+            {
+                "destinatario": destinatario,
+                "nome_publico": nome_publico,
+                "ordem_apoio": ordem_apoio,
+                "url_site": url_site,
+            }
+        )
+        return "msg-123"
+
+    monkeypatch.setattr(rotas_apoios, "enviar_email_confirmacao_apoio", envio_falso)
+
+    response = client.post("/apoios/assinar", data={"nome": "Editora Teste"})
+
+    assert response.status_code == 200
+    assert len(chamadas) == 1
+    assert chamadas[0]["destinatario"] == "editor@teste.local"
+    assert chamadas[0]["nome_publico"] == "Editora Teste"
+    assert chamadas[0]["ordem_apoio"] == 1
+    assert chamadas[0]["url_site"].startswith("http://")
+
+
+@pytest.mark.functional
+def test_apoios_assinar_nao_falha_quando_email_confirmacao_erro(client, monkeypatch):
+    client.post(
+        "/entrar",
+        data={"email": "editor@teste.local", "senha": "123456"},
+    )
+
+    def envio_com_falha(*, config, destinatario, nome_publico, ordem_apoio, url_site):
+        raise RuntimeError("falha simulada")
+
+    monkeypatch.setattr(rotas_apoios, "enviar_email_confirmacao_apoio", envio_com_falha)
 
     response = client.post("/apoios/assinar", data={"nome": "Editora Teste"})
 

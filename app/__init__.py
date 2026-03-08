@@ -70,6 +70,11 @@ def create_app(test_config: dict | None = None) -> Flask:
     app.config["GOOGLE_DISCOVERY_URL"] = os.getenv(
         "GOOGLE_DISCOVERY_URL", "https://accounts.google.com/.well-known/openid-configuration"
     )
+    app.config["RESEND_API_KEY"] = os.getenv("RESEND_API_KEY", "")
+    app.config["RESEND_FROM_EMAIL"] = os.getenv("RESEND_FROM_EMAIL", "")
+    app.config["RESEND_REPLY_TO"] = os.getenv("RESEND_REPLY_TO", "")
+    app.config["APOIOS_EMAIL_CONTATO"] = os.getenv("APOIOS_EMAIL_CONTATO", "")
+    app.config["SITE_URL"] = os.getenv("SITE_URL", "")
     ambiente = os.getenv("AMBIENTE_APLICACAO", "desenvolvimento")
     database_url = os.getenv("DATABASE_URL", "")
 
