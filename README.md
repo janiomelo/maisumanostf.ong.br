@@ -43,6 +43,13 @@ make db-update
 make user-create EMAIL=editor@dominio SENHA=trocar PAPEL=editor
 ```
 
+## Cobertura no GitHub
+
+O workflow `CI - Testes` publica cobertura na interface do GitHub em dois pontos:
+
+- resumo do job (aba de `Checks` do PR/push), com a cobertura total de linhas;
+- artefato `coverage-xml`, contendo o `coverage.xml` gerado na execucao.
+
 ## Configuração por ambiente
 
 As variáveis da home ficam no `.env`:

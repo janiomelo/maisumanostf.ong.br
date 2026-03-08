@@ -33,3 +33,40 @@ jobs:
 
       - name: Rodar testes com cobertura minima
         run: make test-cov
+
+      - name: Publicar artefato de cobertura
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-xml
+          path: coverage.xml
+          if-no-files-found: warn
+
+      - name: Resumo de cobertura no GitHub
+        if: always()
+        run: |
+          if [ ! -f coverage.xml ]; then
+            {
+              echo "## Cobertura"
+              echo
+              echo "`coverage.xml` nao foi gerado nesta execucao."
+            } >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+
+          COBERTURA_TOTAL=$(python - <<'PY'
+          import xml.etree.ElementTree as ET
+
+          root = ET.parse("coverage.xml").getroot()
+          taxa = float(root.attrib.get("line-rate", 0.0)) * 100
+          print(f"{taxa:.2f}")
+          PY
+          )
+
+          {
+            echo "## Cobertura"
+            echo
+            echo "- Cobertura total de linhas: **${COBERTURA_TOTAL}%**"
+            echo "- Arquivo XML: artefato `coverage-xml`"
+            echo "- Regra minima atual: **95%** (`--cov-fail-under=95`)"
+          } >> "$GITHUB_STEP_SUMMARY"
