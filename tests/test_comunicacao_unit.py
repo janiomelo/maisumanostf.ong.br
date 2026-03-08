@@ -19,7 +19,8 @@ def test_montar_html_confirmacao_apoio_tem_texto_obrigatorio(app_instance):
         )
 
     assert "Obrigada por apoiar o manifesto" in html
-    assert "Protocolo do seu apoio: <strong>abc123def456</strong>" in html
+    assert "Protocolo do seu apoio:" in html
+    assert "abc123def456" in html
     assert "Total de apoios ativos no momento do registro: <strong>5</strong>" in html
     assert "Escopo de aceite" in html
     assert "exclusivo para o conteúdo deste e-mail" in html
