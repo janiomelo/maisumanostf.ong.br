@@ -10,7 +10,7 @@ Home da campanha em formato "Wiki de Urgência".
 - Conteúdo institucional (resumo, cronologia, vagas e referências)
 - Wiki dinâmica persistida em banco com edição autenticada por papel
 
-Nesta fase a assinatura pública ainda não está ativa.
+Nesta fase a assinatura autenticada do manifesto esta ativa.
 
 ## Stack
 
@@ -74,6 +74,7 @@ Para bases legadas sem `alembic_version`, use `make db-update` (aplica stamp e u
 - Home: `/`
 - Login: `/entrar`
 - Logout: `/sair`
+- Assinatura do manifesto (autenticada): `/apoios/assinar`
 - Wiki pública: `/wiki/`
 - Gestão da wiki (autenticada): `/wiki/gestao`
 - Nova página wiki (autenticada): `/wiki/nova`

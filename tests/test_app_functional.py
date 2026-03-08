@@ -3,7 +3,7 @@ import re
 import pytest
 
 from app import create_app
-from app.dados.modelos import Usuario
+from app.dados.modelos import ApoioManifesto, Usuario
 
 
 @pytest.mark.functional
@@ -25,6 +25,7 @@ def test_create_app_registra_rotas_principais():
     assert "/admin/usuarios/<int:usuario_id>/atualizar" in rotas
     assert "/admin/usuarios/<int:usuario_id>/desativar" in rotas
     assert "/admin/usuarios/<int:usuario_id>/ativar" in rotas
+    assert "/apoios/assinar" in rotas
 
 
 @pytest.mark.functional
@@ -384,6 +385,75 @@ def test_login_ignora_destino_externo(client):
 
     assert response.status_code == 302
     assert response.headers["Location"].endswith("/wiki/")
+
+
+@pytest.mark.functional
+def test_apoios_assinar_exige_login(client):
+    response = client.get("/apoios/assinar")
+
+    assert response.status_code == 302
+    assert "/entrar?proximo=/apoios/assinar" in response.headers["Location"]
+
+
+@pytest.mark.functional
+def test_apoios_assinar_renderiza_form_para_usuario_logado(client):
+    client.post(
+        "/entrar",
+        data={"email": "editor@teste.local", "senha": "123456"},
+    )
+
+    response = client.get("/apoios/assinar")
+
+    assert response.status_code == 200
+    html = response.get_data(as_text=True)
+    assert "Assinar o Manifesto" in html
+    assert '<form method="post" action="/apoios/assinar">' in html
+
+
+@pytest.mark.functional
+def test_apoios_assinar_retorna_400_sem_nome(client):
+    client.post(
+        "/entrar",
+        data={"email": "editor@teste.local", "senha": "123456"},
+    )
+
+    response = client.post("/apoios/assinar", data={"nome": ""})
+
+    assert response.status_code == 400
+    assert "Informe seu nome" in response.get_data(as_text=True)
+
+
+@pytest.mark.functional
+def test_apoios_assinar_persiste_no_banco(client):
+    client.post(
+        "/entrar",
+        data={"email": "editor@teste.local", "senha": "123456"},
+    )
+
+    response = client.post("/apoios/assinar", data={"nome": "Editora Teste"})
+
+    assert response.status_code == 200
+    assert "Assinatura registrada com sucesso" in response.get_data(as_text=True)
+
+    with client.application.app_context():
+        assinatura = ApoioManifesto.query.filter_by(email="editor@teste.local").first()
+        assert assinatura is not None
+        assert assinatura.nome == "Editora Teste"
+
+
+@pytest.mark.functional
+def test_apoios_assinar_evitar_duplicidade(client):
+    client.post(
+        "/entrar",
+        data={"email": "editor@teste.local", "senha": "123456"},
+    )
+
+    primeiro = client.post("/apoios/assinar", data={"nome": "Editora Teste"})
+    segundo = client.post("/apoios/assinar", data={"nome": "Editora Teste"})
+
+    assert primeiro.status_code == 200
+    assert segundo.status_code == 200
+    assert "ja foi registrada" in segundo.get_data(as_text=True)
 
 
 @pytest.mark.functional

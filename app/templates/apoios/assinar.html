@@ -1,0 +1,28 @@
+{% extends "publico/base.html" %}
+
+{% block title %}Assinar o Manifesto | Mais Uma no STF{% endblock %}
+
+{% block content %}
+<section class="learn-more-box" id="apoios-assinar" aria-label="Formulario de assinatura do manifesto">
+  <h1>Assinar o Manifesto</h1>
+  <p>Registre seu apoio publico ao manifesto da campanha Mais Uma no STF.</p>
+
+  {% if erro %}
+    <p class="civic-alert"><strong>Erro:</strong> {{ erro }}</p>
+  {% endif %}
+
+  {% if sucesso %}
+    <p class="civic-alert"><strong>Sucesso:</strong> {{ sucesso }}</p>
+  {% endif %}
+
+  <form method="post" action="{{ url_for('apoios.salvar_assinatura_manifesto') }}">
+    <p>
+      <label for="nome"><strong>Nome</strong></label><br>
+      <input id="nome" name="nome" type="text" value="{{ nome or '' }}" required style="width:100%;max-width:620px;">
+    </p>
+    <p>
+      <button class="cta-btn" type="submit">Confirmar assinatura</button>
+    </p>
+  </form>
+</section>
+{% endblock %}

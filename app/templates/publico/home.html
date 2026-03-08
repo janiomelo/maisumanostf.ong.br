@@ -32,8 +32,7 @@
     <p class="countdown-target">Meta atual: 26/04/2028 (Vaga Fux)</p>
 
     <div class="hero-cta">
-      <a class="cta-btn" href="#participe">Participe da campanha</a>
-      <p class="signature-counter">A coleta pública de assinaturas será ativada na próxima fase.</p>
+      <a class="cta-btn" href="{{ url_for('apoios.assinar_manifesto') }}">Assinar o manifesto</a>
     </div>
   </aside>
 </section>
@@ -121,17 +120,6 @@
       <li>Luiz Fux — {{ vacancy_labels.fux }}</li>
       <li>Cármen Lúcia — {{ vacancy_labels.carmen }}</li>
       <li>Gilmar Mendes — {{ vacancy_labels.gilmar }}</li>
-    </ul>
-  </article>
-
-  <article id="participe">
-    <h2>Participe</h2>
-    <p>
-      A assinatura pública do manifesto é o foco desta fase de participação.
-    </p>
-    <ul>
-      <li>Em breve: assinatura autenticada do manifesto.</li>
-      <li>Enquanto isso: compartilhe o conteúdo e as referências desta página.</li>
     </ul>
   </article>
 
