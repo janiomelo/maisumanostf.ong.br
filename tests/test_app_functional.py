@@ -149,6 +149,9 @@ def test_sitemap_xml_lista_paginas_publicas(client):
     assert "<urlset" in body
     assert "<loc>http://localhost/</loc>" in body
     assert "<loc>http://localhost/wiki/</loc>" in body
+    assert "<loc>http://localhost/apoios/assinar</loc>" in body
+    assert "<loc>http://localhost/entrar</loc>" in body
+    assert "<loc>http://localhost/wiki/estatuto-basico-ampliado</loc>" in body
 
 
 @pytest.mark.functional

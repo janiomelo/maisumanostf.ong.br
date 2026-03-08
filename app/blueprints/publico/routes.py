@@ -1,5 +1,6 @@
 from flask import Blueprint, jsonify, make_response, render_template, request, url_for
 
+from app.dados.modelos import WikiPagina
 from app.domain.campanha import (
     build_chart_payload,
     build_countdown_target,
@@ -69,9 +70,17 @@ def robots_txt():
 
 @publico_bp.get("/sitemap.xml")
 def sitemap_xml():
+    paginas_wiki = [
+        url_for("wiki.pagina_wiki", slug=pagina.slug, _external=True)
+        for pagina in WikiPagina.query.order_by(WikiPagina.slug.asc()).all()
+    ]
+
     paginas = [
         url_for("main.home", _external=True),
         url_for("wiki.indice_wiki", _external=True),
+        url_for("apoios.assinar_manifesto", _external=True),
+        url_for("autenticacao.entrar", _external=True),
+        *paginas_wiki,
     ]
 
     linhas = [
