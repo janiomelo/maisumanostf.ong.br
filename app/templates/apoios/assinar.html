@@ -48,5 +48,13 @@
       <button class="cta-btn" type="submit">Registrar apoio</button>
     </p>
   </form>
+
+  {% if apoio_registrado %}
+    <hr class="login-divider">
+    <p>Se desejar, você pode remover seu apoio a qualquer momento.</p>
+    <form method="post" action="{{ url_for('apoios.remover_assinatura_manifesto') }}">
+      <button class="theme-btn" type="submit">Remover apoio</button>
+    </form>
+  {% endif %}
 </section>
 {% endblock %}

@@ -30,6 +30,7 @@ def test_create_app_registra_rotas_principais():
     assert "/admin/usuarios/<int:usuario_id>/desativar" in rotas
     assert "/admin/usuarios/<int:usuario_id>/ativar" in rotas
     assert "/apoios/assinar" in rotas
+    assert "/apoios/remover" in rotas
 
 
 @pytest.mark.functional
@@ -587,6 +588,48 @@ def test_apoios_assinar_evitar_duplicidade(client):
     assert primeiro.status_code == 200
     assert segundo.status_code == 200
     assert "já foi registrada" in segundo.get_data(as_text=True)
+
+
+@pytest.mark.functional
+def test_apoios_assinar_exibe_opcao_de_remocao_quando_apoio_ja_existe(client):
+    client.post(
+        "/entrar",
+        data={"email": "editor@teste.local", "senha": "123456"},
+    )
+    client.post("/apoios/assinar", data={"nome": "Editora Teste"})
+
+    response = client.get("/apoios/assinar")
+
+    assert response.status_code == 200
+    html = response.get_data(as_text=True)
+    assert "Remover apoio" in html
+    assert '<form method="post" action="/apoios/remover">' in html
+
+
+@pytest.mark.functional
+def test_apoios_remover_exige_login(client):
+    response = client.post("/apoios/remover")
+
+    assert response.status_code == 302
+    assert "/entrar?proximo=/apoios/assinar" in response.headers["Location"]
+
+
+@pytest.mark.functional
+def test_apoios_remover_apaga_registro_existente(client):
+    client.post(
+        "/entrar",
+        data={"email": "editor@teste.local", "senha": "123456"},
+    )
+    client.post("/apoios/assinar", data={"nome": "Editora Teste"})
+
+    response = client.post("/apoios/remover")
+
+    assert response.status_code == 200
+    assert "Seu apoio foi removido com sucesso." in response.get_data(as_text=True)
+
+    with client.application.app_context():
+        assinatura = ApoioManifesto.query.filter_by(email="editor@teste.local").first()
+        assert assinatura is None
 
 
 @pytest.mark.functional
