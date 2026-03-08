@@ -19,10 +19,11 @@
   <script defer src="{{ url_for('static', filename='main.js') }}"></script>
 </head>
 <body>
+  <a class="skip-link" href="#conteudo-principal">Ir para o conteudo principal</a>
   <header class="topbar">
     <div class="container nav-wrap">
       <a class="logo" href="{{ url_for('main.home') }}">Mais Uma No STF</a>
-      <nav>
+      <nav aria-label="Navegacao principal">
         <a href="#manifesto">Manifesto</a>
         <a href="#sobre">Sobre</a>
         <a href="#participe">Participe</a>
@@ -40,12 +41,12 @@
         {% else %}
           <a href="{{ url_for('autenticacao.entrar') }}">Entrar</a>
         {% endif %}
-        <button class="theme-btn" id="themeToggle" type="button">☼</button>
+        <button class="theme-btn" id="themeToggle" type="button" aria-label="Alternar tema do site" title="Alternar tema">☼</button>
       </div>
     </div>
   </header>
 
-  <main class="container">
+  <main class="container" id="conteudo-principal" tabindex="-1">
     {% block content %}{% endblock %}
   </main>
 
