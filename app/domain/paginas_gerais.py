@@ -46,6 +46,10 @@ def atualizar_configuracoes_paginas_gerais(*, estatuto_slug: str, politica_slug:
     db.session.commit()
 
 
+def listar_paginas_wiki_para_configuracao() -> list[WikiPagina]:
+    return WikiPagina.query.order_by(WikiPagina.slug.asc()).all()
+
+
 def carregar_links_paginas_gerais() -> dict[str, dict[str, str] | None]:
     cfg = carregar_configuracoes_paginas_gerais()
 
@@ -68,4 +72,16 @@ def carregar_links_paginas_gerais() -> dict[str, dict[str, str] | None]:
         "estatuto": _resolver(cfg[CHAVE_WIKI_ESTATUTO], "Transparência e Governança"),
         "politica_privacidade": _resolver(cfg[CHAVE_WIKI_POLITICA_PRIVACIDADE], "Política de Privacidade"),
         "termos_uso": _resolver(cfg[CHAVE_WIKI_TERMOS_USO], "Termos de Uso"),
+    }
+
+
+def montar_contexto_paginas_gerais_admin(*, erro: str | None = None, sucesso: str | None = None) -> dict[str, object]:
+    return {
+        "erro": erro,
+        "sucesso": sucesso,
+        "paginas_wiki": listar_paginas_wiki_para_configuracao(),
+        "chave_estatuto": CHAVE_WIKI_ESTATUTO,
+        "chave_politica": CHAVE_WIKI_POLITICA_PRIVACIDADE,
+        "chave_termos": CHAVE_WIKI_TERMOS_USO,
+        "config": carregar_configuracoes_paginas_gerais(),
     }

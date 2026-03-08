@@ -8,14 +8,13 @@ from app.autenticacao import (
 	listar_usuarios,
 )
 from app.autorizacao import PAPEIS_VALIDOS, exigir_permissao
-from app.paginas_gerais import (
+from app.domain.paginas_gerais import (
 	CHAVE_WIKI_ESTATUTO,
 	CHAVE_WIKI_POLITICA_PRIVACIDADE,
 	CHAVE_WIKI_TERMOS_USO,
 	atualizar_configuracoes_paginas_gerais,
-	carregar_configuracoes_paginas_gerais,
+	montar_contexto_paginas_gerais_admin,
 )
-from app.dados.modelos import WikiPagina
 
 admin_bp = Blueprint("admin", __name__, url_prefix="/admin")
 
@@ -66,18 +65,10 @@ def painel_admin():
 @admin_bp.get("/paginas-gerais")
 @exigir_permissao("admin", "gerenciar")
 def paginas_gerais_admin():
-	config = carregar_configuracoes_paginas_gerais()
-	paginas_wiki = WikiPagina.query.order_by(WikiPagina.slug.asc()).all()
 	return render_template(
 		"admin/paginas-gerais.html",
 		aba_admin_ativa="paginas-gerais",
-		erro=None,
-		sucesso=None,
-		paginas_wiki=paginas_wiki,
-		chave_estatuto=CHAVE_WIKI_ESTATUTO,
-		chave_politica=CHAVE_WIKI_POLITICA_PRIVACIDADE,
-		chave_termos=CHAVE_WIKI_TERMOS_USO,
-		config=config,
+		**montar_contexto_paginas_gerais_admin(erro=None, sucesso=None),
 	)
 
 
@@ -95,18 +86,10 @@ def salvar_paginas_gerais_admin():
 			termos_slug=termos_slug,
 		)
 	except ValueError as exc:
-		config = carregar_configuracoes_paginas_gerais()
-		paginas_wiki = WikiPagina.query.order_by(WikiPagina.slug.asc()).all()
 		return render_template(
 			"admin/paginas-gerais.html",
 			aba_admin_ativa="paginas-gerais",
-			erro=str(exc),
-			sucesso=None,
-			paginas_wiki=paginas_wiki,
-			chave_estatuto=CHAVE_WIKI_ESTATUTO,
-			chave_politica=CHAVE_WIKI_POLITICA_PRIVACIDADE,
-			chave_termos=CHAVE_WIKI_TERMOS_USO,
-			config=config,
+			**montar_contexto_paginas_gerais_admin(erro=str(exc), sucesso=None),
 		), 400
 
 	return redirect(url_for("admin.paginas_gerais_admin"))

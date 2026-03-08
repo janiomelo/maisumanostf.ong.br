@@ -2,7 +2,7 @@ import pytest
 
 from app.dados import db
 from app.dados.modelos import ConfiguracaoPublica, WikiPagina
-from app.paginas_gerais import servico
+from app.domain import paginas_gerais as servico
 
 
 @pytest.mark.unit

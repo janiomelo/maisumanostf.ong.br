@@ -1,4 +1,4 @@
-from .servico import (
+from app.domain.paginas_gerais import (
     CHAVE_WIKI_ESTATUTO,
     CHAVE_WIKI_POLITICA_PRIVACIDADE,
     CHAVE_WIKI_TERMOS_USO,

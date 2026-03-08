@@ -9,7 +9,7 @@ from app.domain.campanha import (
     get_setting,
     vacancy_dates,
 )
-from app.paginas_gerais import carregar_links_paginas_gerais
+from app.domain.paginas_gerais import carregar_links_paginas_gerais
 
 publico_bp = Blueprint("main", __name__)
 
