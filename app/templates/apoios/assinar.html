@@ -4,23 +4,26 @@
 
 {% block content %}
 <section class="learn-more-box" id="apoios-assinar" aria-label="Formulário de assinatura do manifesto">
-  <h1>Assinar o Manifesto</h1>
-  <p>Esta página é o fechamento do manifesto: transformar diagnóstico em apoio público verificável.</p>
+  <h1>Página de Apoios</h1>
+  <p>Esta página registra apoios ao manifesto de forma simples e transparente, sem prometer efeitos imediatos.</p>
 
   <section class="manifesto-resumo" aria-label="Resumo do manifesto">
-    <h2>Resumo em 3 pontos</h2>
-    <ol>
-      <li>Hoje o STF está em nível crítico de representatividade feminina.</li>
-      <li>Sem ação pública na próxima vaga, o risco é chegar a zero mulheres na Corte.</li>
-      <li>A campanha defende um compromisso mínimo imediato: nomeação feminina para manter o patamar civilizatório.</li>
-    </ol>
+    <h2>Resumo</h2>
+    <p>
+      A campanha defende um objetivo específico: que a próxima vaga do STF seja ocupada por mais uma mulher,
+      preservando o patamar mínimo de representatividade feminina já alcançado na Corte.
+    </p>
+    <p>
+      Nesta etapa, a página de apoios funciona como registro público de adesão ao manifesto,
+      sem prometer efeitos imediatos além da transparência sobre o número de apoios.
+    </p>
   </section>
 
   <section class="manifesto-resumo" aria-label="O que acontece depois da assinatura">
     <h2>Depois da assinatura</h2>
     <ul>
       <li>Seu apoio fica registrado de forma única, vinculado ao seu login.</li>
-      <li>Você reforça publicamente o compromisso mínimo da campanha para a próxima vaga.</li>
+      <li>O número de apoios será acompanhado e poderá ser divulgado no site no futuro.</li>
       <li>A página pode ser revisitada a qualquer momento para confirmar seu registro.</li>
     </ul>
   </section>
@@ -35,11 +38,14 @@
 
   <form method="post" action="{{ url_for('apoios.salvar_assinatura_manifesto') }}">
     <p>
-      <label for="nome"><strong>Nome</strong></label><br>
-      <input id="nome" name="nome" type="text" value="{{ nome or '' }}" required style="width:100%;max-width:620px;">
+      <label for="nome"><strong>Nome público (opcional)</strong></label><br>
+      <input id="nome" name="nome" type="text" value="{{ nome or '' }}" style="width:100%;max-width:620px;">
     </p>
     <p>
-      <button class="cta-btn" type="submit">Confirmar assinatura</button>
+      <small>Se informado, o nome poderá ser exibido publicamente no futuro junto ao total de apoios.</small>
+    </p>
+    <p>
+      <button class="cta-btn" type="submit">Registrar apoio</button>
     </p>
   </form>
 </section>

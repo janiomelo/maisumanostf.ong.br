@@ -34,9 +34,6 @@ def salvar_assinatura_manifesto():
 		return redirecionamento
 
 	nome = request.form.get("nome", "").strip()
-	if not nome:
-		erro = "Informe seu nome para registrar a assinatura."
-		return render_template("apoios/assinar.html", erro=erro, sucesso=None, nome=""), 400
 
 	email = str(g.usuario_email).strip().lower()
 	apoio_existente = ApoioManifesto.query.filter_by(email=email).first()

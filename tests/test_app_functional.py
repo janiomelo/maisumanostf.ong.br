@@ -528,16 +528,18 @@ def test_apoios_assinar_renderiza_form_para_usuario_logado(client):
 
     assert response.status_code == 200
     html = response.get_data(as_text=True)
-    assert "Assinar o Manifesto" in html
-    assert "Resumo em 3 pontos" in html
-    assert "transformar diagnóstico em apoio público verificável" in html
+    assert "Página de Apoios" in html
+    assert "Resumo" in html
+    assert "sem prometer efeitos imediatos" in html
     assert "Depois da assinatura" in html
     assert "Seu apoio fica registrado de forma única" in html
+    assert "número de apoios será acompanhado" in html
+    assert "Nome público (opcional)" in html
     assert '<form method="post" action="/apoios/assinar">' in html
 
 
 @pytest.mark.functional
-def test_apoios_assinar_retorna_400_sem_nome(client):
+def test_apoios_assinar_aceita_nome_vazio(client):
     client.post(
         "/entrar",
         data={"email": "editor@teste.local", "senha": "123456"},
@@ -545,8 +547,13 @@ def test_apoios_assinar_retorna_400_sem_nome(client):
 
     response = client.post("/apoios/assinar", data={"nome": ""})
 
-    assert response.status_code == 400
-    assert "Informe seu nome" in response.get_data(as_text=True)
+    assert response.status_code == 200
+    assert "Assinatura registrada com sucesso" in response.get_data(as_text=True)
+
+    with client.application.app_context():
+        assinatura = ApoioManifesto.query.filter_by(email="editor@teste.local").first()
+        assert assinatura is not None
+        assert assinatura.nome == ""
 
 
 @pytest.mark.functional
