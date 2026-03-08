@@ -3,12 +3,14 @@ from datetime import UTC, datetime, timedelta
 
 import pytest
 from flask import redirect
+from sqlalchemy.exc import OperationalError
 
 from app import create_app
 from app.dados.base import db
 from app.dados.modelos import ApoioManifesto, Usuario
 import app.blueprints.autenticacao.routes as rotas_autenticacao
 import app.blueprints.apoios.routes as rotas_apoios
+import app.blueprints.publico.routes as rotas_publico
 
 
 @pytest.mark.functional
@@ -156,6 +158,32 @@ def test_sitemap_xml_lista_paginas_publicas(client):
     assert "<loc>http://localhost/wiki/estatuto-base</loc>" in body
     assert "<loc>http://localhost/wiki/politica-de-privacidade</loc>" in body
     assert "<loc>http://localhost/wiki/termos-de-uso</loc>" in body
+
+
+@pytest.mark.functional
+def test_sitemap_xml_mantem_urls_basicas_quando_banco_indisponivel(client, monkeypatch):
+    class QueryQueFalha:
+        def order_by(self, *args, **kwargs):
+            raise OperationalError("select", {}, Exception("falha simulada"))
+
+    class WikiPaginaFalsa:
+        class slug:
+            @staticmethod
+            def asc():
+                return None
+
+        query = QueryQueFalha()
+
+    monkeypatch.setattr(rotas_publico, "WikiPagina", WikiPaginaFalsa)
+
+    response = client.get("/sitemap.xml")
+
+    assert response.status_code == 200
+    body = response.get_data(as_text=True)
+    assert "<loc>http://localhost/</loc>" in body
+    assert "<loc>http://localhost/wiki/</loc>" in body
+    assert "<loc>http://localhost/apoios/assinar</loc>" in body
+    assert "<loc>http://localhost/entrar</loc>" in body
 
 
 @pytest.mark.functional

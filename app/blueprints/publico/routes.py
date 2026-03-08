@@ -1,4 +1,5 @@
-from flask import Blueprint, jsonify, make_response, render_template, request, url_for
+from flask import Blueprint, current_app, jsonify, make_response, render_template, request, url_for
+from sqlalchemy.exc import OperationalError
 
 from app.dados.modelos import WikiPagina
 from app.domain.campanha import (
@@ -78,17 +79,23 @@ def robots_txt():
 
 @publico_bp.get("/sitemap.xml")
 def sitemap_xml():
-    paginas_wiki = [
-        url_for("wiki.pagina_wiki", slug=pagina.slug, _external=True)
-        for pagina in WikiPagina.query.order_by(WikiPagina.slug.asc()).all()
-    ]
+    paginas_wiki: list[str] = []
+    extras_configurados: list[str] = []
 
-    paginas_gerais = carregar_links_paginas_gerais()
-    extras_configurados = [
-        url_for("wiki.pagina_wiki", slug=item["slug"], _external=True)
-        for item in paginas_gerais.values()
-        if item is not None
-    ]
+    try:
+        paginas_wiki = [
+            url_for("wiki.pagina_wiki", slug=pagina.slug, _external=True)
+            for pagina in WikiPagina.query.order_by(WikiPagina.slug.asc()).all()
+        ]
+
+        paginas_gerais = carregar_links_paginas_gerais()
+        extras_configurados = [
+            url_for("wiki.pagina_wiki", slug=item["slug"], _external=True)
+            for item in paginas_gerais.values()
+            if item is not None
+        ]
+    except OperationalError as exc:
+        current_app.logger.warning("Falha ao consultar banco para sitemap.xml. Mantendo URLs públicas básicas: %s", exc)
 
     paginas = [
         url_for("main.home", _external=True),
