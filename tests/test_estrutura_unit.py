@@ -2,21 +2,9 @@ import pytest
 from sqlalchemy import inspect
 
 import app as app_module
-from app import _normalizar_database_url, create_app, main
+from app import _normalizar_database_url, create_app
 from app.dados.base import db
 from app.dados.modelos import WikiPagina
-
-
-@pytest.mark.unit
-def test_modulo_compatibilidade_expoe_componentes_legados():
-    assert main.main_bp.name == "main"
-    assert callable(main.get_setting)
-    assert callable(main.parse_iso_date)
-    assert callable(main.year_fraction)
-    assert callable(main.format_br)
-    assert callable(main.vacancy_dates)
-    assert callable(main.build_chart_payload)
-    assert callable(main._build_countdown_target)
 
 
 @pytest.mark.unit
