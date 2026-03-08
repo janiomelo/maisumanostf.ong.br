@@ -166,7 +166,7 @@ h2 {
   font-family: "Times New Roman", Times, serif;
 }
 
-.lead { color: var(--muted); }
+.lead { color: var(--text); }
 
 .civic-alert {
   margin: .8rem 0 0;
@@ -201,7 +201,7 @@ h2 {
 
 .learn-more-box p {
   margin-top: 0;
-  color: var(--muted);
+  color: var(--text);
   font-size: .95rem;
 }
 
@@ -248,7 +248,7 @@ h2 {
 }
 
 .countdown-target {
-  color: var(--muted);
+  color: var(--text);
   font-size: .95rem;
 }
 
@@ -262,7 +262,7 @@ h2 {
 
 .chart-summary {
   margin-top: -.2rem;
-  color: var(--muted);
+  color: var(--text);
 }
 
 .chart-legend-note {
@@ -386,7 +386,7 @@ h2 {
 }
 
 .signature-counter {
-  color: var(--muted);
+  color: var(--text);
 }
 
 .wiki {
@@ -457,7 +457,7 @@ button {
 
 .footer-grid p {
   margin: 0;
-  color: var(--muted);
+  color: var(--text);
 }
 
 .footer-grid ul {
@@ -471,7 +471,11 @@ button {
 .footer-bottom {
   border-top: 1px solid var(--border);
   padding: .75rem 0 1rem;
-  color: var(--muted);
+  color: var(--text);
+}
+
+.footer-bottom small {
+  font-size: .95rem;
 }
 
 @media (max-width: 900px) {
