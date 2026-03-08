@@ -16,14 +16,19 @@
     </ul>
   </div>
 
-  <aside class="countdown-box" data-alvo="{{ countdown_target }}">
-    <p class="countdown-kicker">Tempo para garantir o mínimo civilizatório</p>
-    <div class="countdown-grid">
-      <div><strong id="cdDays">0</strong><span>dias</span></div>
-      <div><strong id="cdHours">0</strong><span>horas</span></div>
-      <div><strong id="cdMinutes">0</strong><span>min</span></div>
-      <div><strong id="cdSeconds">0</strong><span>seg</span></div>
-    </div>
+  <aside
+    class="countdown-box"
+    data-alvo="{{ countdown_target }}"
+    role="region"
+    aria-labelledby="countdown-title"
+  >
+    <h2 id="countdown-title" class="countdown-kicker">Tempo para garantir o minimo civilizatorio</h2>
+    <ul class="countdown-grid" aria-label="Contagem regressiva para a proxima vaga">
+      <li><strong id="cdDays" aria-live="polite">0</strong><span>dias</span></li>
+      <li><strong id="cdHours" aria-live="polite">0</strong><span>horas</span></li>
+      <li><strong id="cdMinutes" aria-live="polite">0</strong><span>min</span></li>
+      <li><strong id="cdSeconds" aria-live="polite">0</strong><span>seg</span></li>
+    </ul>
     <p class="countdown-target">Meta atual: 26/04/2028 (Vaga Fux)</p>
 
     <div class="hero-cta">

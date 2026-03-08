@@ -228,12 +228,15 @@ h2 {
 }
 
 .countdown-grid {
+  list-style: none;
+  margin: 0;
+  padding: 0;
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: .65rem;
 }
 
-.countdown-grid div {
+.countdown-grid li {
   border: 1px solid var(--border);
   background: var(--bg);
   padding: .6rem;
