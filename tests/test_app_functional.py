@@ -396,7 +396,7 @@ def test_oauth_google_iniciar_retorna_503_quando_desabilitado(client):
 
     response = client.get("/auth/google/iniciar")
 
-    assert response.status_code == 503
+    assert response.status_code == 200
     assert "Login com Google indisponivel" in response.get_data(as_text=True)
 
 
@@ -467,6 +467,33 @@ def test_oauth_google_callback_bloqueia_email_nao_verificado(client, monkeypatch
 
     assert response.status_code == 401
     assert "e-mail verificado" in response.get_data(as_text=True)
+
+
+@pytest.mark.functional
+def test_oauth_google_callback_retorna_mensagem_amigavel_quando_falha_persistencia_local(client, monkeypatch):
+    with client.session_transaction() as sessao:
+        sessao["oauth_google_proximo"] = "/apoios/assinar"
+
+    monkeypatch.setattr(
+        rotas_autenticacao,
+        "trocar_codigo_por_usuario_google",
+        lambda: {
+            "sub": "google-sub-500",
+            "email": "falha.persistencia@teste.local",
+            "email_verified": True,
+            "name": "Falha Persistencia",
+        },
+    )
+    monkeypatch.setattr(
+        rotas_autenticacao,
+        "obter_ou_criar_usuario_google",
+        lambda sub, email, email_verificado: (_ for _ in ()).throw(RuntimeError("falha simulada")),
+    )
+
+    response = client.get("/auth/google/callback")
+
+    assert response.status_code == 400
+    assert "Nao foi possivel concluir o login com Google agora" in response.get_data(as_text=True)
 
 
 @pytest.mark.functional
