@@ -31,6 +31,7 @@ def test_create_app_registra_rotas_principais():
     assert "/wiki/nova" in rotas
     assert "/wiki/<slug>" in rotas
     assert "/wiki/<slug>/editar" in rotas
+    assert "/admin" in rotas
     assert "/admin/usuarios" in rotas
     assert "/admin/usuarios/<int:usuario_id>/atualizar" in rotas
     assert "/admin/usuarios/<int:usuario_id>/desativar" in rotas
@@ -404,6 +405,7 @@ def test_login_logout_funciona_e_renderiza_estado_no_topo(client):
     assert login.status_code == 200
     html_logado = login.get_data(as_text=True)
     assert "editor@teste.local (editor)" in html_logado
+    assert ">Admin<" not in html_logado
 
     logout = client.post("/sair", follow_redirects=True)
     assert logout.status_code == 200
@@ -777,6 +779,43 @@ def test_admin_usuarios_exige_autenticacao(client):
     response = client.get("/admin/usuarios")
     assert response.status_code == 302
     assert "/entrar?proximo=/admin/usuarios" in response.headers["Location"]
+
+
+@pytest.mark.functional
+def test_admin_painel_exige_autenticacao(client):
+    response = client.get("/admin")
+    assert response.status_code == 302
+    assert "/entrar?proximo=/admin" in response.headers["Location"]
+
+
+@pytest.mark.functional
+def test_admin_painel_bloqueia_editor(client):
+    client.post(
+        "/entrar",
+        data={"email": "editor@teste.local", "senha": "123456"},
+    )
+
+    response = client.get("/admin")
+    assert response.status_code == 403
+
+
+@pytest.mark.functional
+def test_admin_painel_renderiza_links_e_botao_no_header_para_admin(client):
+    client.post(
+        "/entrar",
+        data={"email": "admin@teste.local", "senha": "abc123"},
+    )
+
+    home = client.get("/")
+    assert home.status_code == 200
+    assert 'href="/admin">Admin</a>' in home.get_data(as_text=True)
+
+    response = client.get("/admin")
+    assert response.status_code == 200
+    html = response.get_data(as_text=True)
+    assert "Painel de Administração" in html
+    assert 'href="/admin/usuarios"' in html
+    assert 'href="/admin/apoios"' in html
 
 
 @pytest.mark.functional

@@ -7,6 +7,8 @@
   <h1>Admin de Usuários</h1>
   <p>CRUD interno de usuários e papéis de acesso.</p>
 
+  {% include "admin/_abas.html" %}
+
   {% if erro %}
     <p class="civic-alert"><strong>Erro:</strong> {{ erro }}</p>
   {% endif %}

@@ -42,10 +42,17 @@ def listar_usuarios_admin():
 	usuarios = listar_usuarios()
 	return render_template(
 		"admin/usuarios.html",
+		aba_admin_ativa="usuarios",
 		usuarios=usuarios,
 		papeis_validos=PAPEIS_VALIDOS,
 		erro=None,
 	)
+
+
+@admin_bp.get("")
+@exigir_permissao("admin", "gerenciar")
+def painel_admin():
+	return render_template("admin/painel.html", aba_admin_ativa="painel")
 
 
 @admin_bp.post("/usuarios")
@@ -141,6 +148,7 @@ def listar_apoios_admin_route():
 
 	return render_template(
 		"admin/apoios.html",
+		aba_admin_ativa="apoios",
 		apoios=resultado.apoios,
 		total_geral=resultado.total_geral,
 		total_filtrado=resultado.total_filtrado,

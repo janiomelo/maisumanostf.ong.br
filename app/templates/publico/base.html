@@ -39,10 +39,10 @@
       <a class="logo" href="{{ url_for('main.home') }}">Mais Uma No STF</a>
       <div class="auth-area">
         {% if usuario_esta_logado %}
-          {% if papel_atual == "admin" %}
-            <a href="{{ url_for('admin.listar_usuarios_admin') }}">Admin usuários</a>
-          {% endif %}
           <small>{{ usuario_email }} ({{ papel_atual }})</small>
+          {% if papel_atual == "admin" %}
+            <a class="theme-btn" href="{{ url_for('admin.painel_admin') }}">Admin</a>
+          {% endif %}
           <form method="post" action="{{ url_for('autenticacao.sair') }}">
             <button class="theme-btn" type="submit">Sair</button>
           </form>

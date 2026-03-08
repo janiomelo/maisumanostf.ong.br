@@ -1,0 +1,23 @@
+{% extends "publico/base.html" %}
+
+{% block title %}Painel Admin | Mais Uma no STF{% endblock %}
+
+{% block content %}
+<section class="learn-more-box" id="admin-painel" aria-label="Painel de administração">
+  <h1>Painel de Administração</h1>
+  <p>Escolha a área administrativa que deseja acessar.</p>
+
+  {% include "admin/_abas.html" %}
+
+  <div class="admin-links-grid">
+    <a class="admin-link-card" href="{{ url_for('admin.listar_usuarios_admin') }}">
+      <h2>Usuários</h2>
+      <p>Gerenciar cadastro, papel e status de acesso.</p>
+    </a>
+    <a class="admin-link-card" href="{{ url_for('admin.listar_apoios_admin_route') }}">
+      <h2>Aceites</h2>
+      <p>Consultar, filtrar, paginar e excluir registros de apoio.</p>
+    </a>
+  </div>
+</section>
+{% endblock %}

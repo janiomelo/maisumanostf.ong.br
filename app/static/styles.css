@@ -167,6 +167,54 @@ select:focus-visible {
   padding: .3rem .6rem;
 }
 
+.admin-tabs {
+  display: flex;
+  gap: .5rem;
+  flex-wrap: wrap;
+  margin: .8rem 0 1rem;
+}
+
+.admin-tabs a {
+  text-decoration: none;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: .35rem .7rem;
+  color: var(--text);
+  background: color-mix(in srgb, var(--surface) 78%, var(--bg));
+}
+
+.admin-tabs a.ativa {
+  background: var(--accent);
+  color: var(--accent-contrast);
+  border-color: color-mix(in srgb, var(--accent) 75%, var(--border));
+}
+
+.admin-links-grid {
+  display: grid;
+  gap: .8rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.admin-link-card {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: .9rem;
+  background: color-mix(in srgb, var(--surface) 85%, var(--bg));
+  color: var(--text);
+  text-decoration: none;
+}
+
+.admin-link-card h2 {
+  margin-top: 0;
+  margin-bottom: .4rem;
+}
+
+@media (max-width: 800px) {
+  .admin-links-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
 .hero {
   display: grid;
   grid-template-columns: 2fr 1fr;
