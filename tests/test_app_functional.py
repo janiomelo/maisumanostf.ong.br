@@ -130,7 +130,7 @@ def test_static_social_card_disponivel(client):
 
 
 @pytest.mark.functional
-def test_robots_txt_permite_indexacao_total(client):
+def test_robots_txt_bloqueia_areas_restritas(client):
     response = client.get("/robots.txt")
 
     assert response.status_code == 200
@@ -138,6 +138,8 @@ def test_robots_txt_permite_indexacao_total(client):
     body = response.get_data(as_text=True)
     assert "User-agent: *" in body
     assert "Allow: /" in body
+    assert "Disallow: /admin" in body
+    assert "Disallow: /autenticacao" in body
     assert "Sitemap: " in body
     assert "/sitemap.xml" in body
 

@@ -71,7 +71,13 @@ def api_countdown_legado():
 @publico_bp.get("/robots.txt")
 def robots_txt():
     sitemap_url = url_for("main.sitemap_xml", _external=True)
-    conteudo = f"User-agent: *\nAllow: /\nSitemap: {sitemap_url}\n"
+    conteudo = (
+        "User-agent: *\n"
+        "Allow: /\n"
+        "Disallow: /admin\n"
+        "Disallow: /autenticacao\n"
+        f"Sitemap: {sitemap_url}\n"
+    )
     response = make_response(conteudo)
     response.mimetype = "text/plain"
     return response
