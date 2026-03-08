@@ -20,15 +20,30 @@ branch_labels = None
 depends_on = None
 
 
-def _gerar_protocolo_legado(email: str, criado_em: datetime, apoio_id: int) -> str:
-    base = f"{criado_em.isoformat()}|{email}|{apoio_id}".encode("utf-8")
+def _normalizar_criado_em(criado_em: datetime | str | None) -> str:
+    if isinstance(criado_em, datetime):
+        return criado_em.isoformat()
+
+    if isinstance(criado_em, str):
+        return criado_em.strip()
+
+    return ""
+
+
+def _gerar_protocolo_legado(email: str, criado_em: datetime | str | None, apoio_id: int) -> str:
+    criado_em_str = _normalizar_criado_em(criado_em)
+    base = f"{criado_em_str}|{email}|{apoio_id}".encode("utf-8")
     return hashlib.sha256(base).hexdigest()
 
 
 def upgrade():
-    op.add_column("apoios_manifesto", sa.Column("protocolo", sa.String(length=64), nullable=True))
-
     conn = op.get_bind()
+    insp = sa.inspect(conn)
+
+    colunas = {c["name"] for c in insp.get_columns("apoios_manifesto")}
+    if "protocolo" not in colunas:
+        op.add_column("apoios_manifesto", sa.Column("protocolo", sa.String(length=64), nullable=True))
+
     registros = conn.execute(
         sa.text("SELECT id, email, criado_em FROM apoios_manifesto ORDER BY id ASC")
     ).fetchall()
@@ -42,7 +57,11 @@ def upgrade():
 
     with op.batch_alter_table("apoios_manifesto") as batch_op:
         batch_op.alter_column("protocolo", existing_type=sa.String(length=64), nullable=False)
-        batch_op.create_index(op.f("ix_apoios_manifesto_protocolo"), ["protocolo"], unique=True)
+
+    indices = {idx["name"] for idx in sa.inspect(conn).get_indexes("apoios_manifesto")}
+    indice = op.f("ix_apoios_manifesto_protocolo")
+    if indice not in indices:
+        op.create_index(indice, "apoios_manifesto", ["protocolo"], unique=True)
 
 
 def downgrade():
