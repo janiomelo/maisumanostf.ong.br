@@ -15,7 +15,6 @@
     <section class="login-principal" aria-label="Entrada principal">
       <h2>Entrar com Google</h2>
       <p class="login-help">Recomendado para todas as pessoas usuárias, inclusive administração.</p>
-      <p class="login-help">Em produção, este é o método principal e permanece sempre ativo.</p>
       <p>
         <a class="cta-btn" href="{{ url_for('autenticacao.iniciar_oauth_google', proximo=proximo or url_for('apoios.assinar_manifesto')) }}">Continuar com Google</a>
       </p>
