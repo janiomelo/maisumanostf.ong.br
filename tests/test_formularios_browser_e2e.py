@@ -38,8 +38,14 @@ def test_formularios_login_e_wiki_funcionam_no_navegador(servidor_http_local):
             page = browser.new_page()
 
             page.goto(f"{servidor_http_local}/entrar", wait_until="networkidle")
-            page.fill("#email", "editor@teste.local")
-            page.fill("#senha", "123456")
+
+            # Quando OAuth Google está ativo, o formulário de e-mail/senha fica em <details>.
+            login_secundario = page.locator("details.login-secundario")
+            if login_secundario.count() > 0:
+                login_secundario.locator("summary").click()
+
+            page.locator("input#email").first.fill("editor@teste.local")
+            page.locator("input#senha").first.fill("123456")
             page.locator("form[action$='/entrar'] button[type='submit']").click()
 
             page.wait_for_url("**/wiki/")
