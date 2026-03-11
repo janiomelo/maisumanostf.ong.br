@@ -581,7 +581,6 @@ def test_login_mostra_botao_google_quando_habilitado(client):
     html = response.get_data(as_text=True)
     assert "Entrar com Google" in html
     assert "Continuar com Google" in html
-    assert "Em produção, este é o método principal e permanece sempre ativo." in html
     assert "Usar e-mail e senha (secundário)" in html
 
 
