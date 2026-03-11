@@ -106,7 +106,6 @@ def sitemap_xml():
     paginas = [
         url_for("main.home", _external=True),
         url_for("wiki.indice_wiki", _external=True),
-        url_for("apoios.assinar_manifesto", _external=True),
         url_for("autenticacao.entrar", _external=True),
         *extras_configurados,
         *paginas_wiki,
