@@ -2,6 +2,7 @@ import os
 
 from flask import Flask, g, session
 from flask_talisman import Talisman
+from werkzeug.middleware.proxy_fix import ProxyFix
 
 from .autenticacao import bootstrap_admin_por_ambiente
 from .autenticacao.google_oauth import inicializar_google_oauth
@@ -32,6 +33,17 @@ def _ler_bool_env(chave: str, padrao: bool = False) -> bool:
         return padrao
 
     return valor.strip().lower() in {"1", "true", "t", "yes", "y", "on", "sim"}
+
+
+def _ler_int_env(chave: str, padrao: int) -> int:
+    valor = os.getenv(chave)
+    if valor is None:
+        return padrao
+
+    try:
+        return max(0, int(valor.strip()))
+    except ValueError:
+        return padrao
 
 
 def _montar_engine_options(database_uri: str, ambiente: str) -> dict:
@@ -90,6 +102,26 @@ def _configurar_headers_seguranca(app: Flask, ambiente: str) -> None:
     )
 
 
+def _configurar_proxy_reverso(app: Flask) -> None:
+    x_for = int(app.config.get("PROXY_FIX_X_FOR", 0))
+    x_proto = int(app.config.get("PROXY_FIX_X_PROTO", 0))
+    x_host = int(app.config.get("PROXY_FIX_X_HOST", 0))
+    x_port = int(app.config.get("PROXY_FIX_X_PORT", 0))
+    x_prefix = int(app.config.get("PROXY_FIX_X_PREFIX", 0))
+
+    if not any((x_for, x_proto, x_host, x_port, x_prefix)):
+        return
+
+    app.wsgi_app = ProxyFix(
+        app.wsgi_app,
+        x_for=x_for,
+        x_proto=x_proto,
+        x_host=x_host,
+        x_port=x_port,
+        x_prefix=x_prefix,
+    )
+
+
 def create_app(test_config: dict | None = None) -> Flask:
     app = Flask(__name__)
 
@@ -126,6 +158,13 @@ def create_app(test_config: dict | None = None) -> Flask:
 
     app.config.setdefault("SECURITY_HEADERS_ENABLED", _ler_bool_env("SECURITY_HEADERS_ENABLED", True))
     app.config.setdefault("TALISMAN_FORCE_HTTPS", _ler_bool_env("TALISMAN_FORCE_HTTPS", ambiente == "producao"))
+    app.config.setdefault("PROXY_FIX_X_FOR", _ler_int_env("PROXY_FIX_X_FOR", 1 if ambiente == "producao" else 0))
+    app.config.setdefault("PROXY_FIX_X_PROTO", _ler_int_env("PROXY_FIX_X_PROTO", 1 if ambiente == "producao" else 0))
+    app.config.setdefault("PROXY_FIX_X_HOST", _ler_int_env("PROXY_FIX_X_HOST", 1 if ambiente == "producao" else 0))
+    app.config.setdefault("PROXY_FIX_X_PORT", _ler_int_env("PROXY_FIX_X_PORT", 0))
+    app.config.setdefault("PROXY_FIX_X_PREFIX", _ler_int_env("PROXY_FIX_X_PREFIX", 0))
+
+    _configurar_proxy_reverso(app)
 
     @app.before_request
     def carregar_contexto_autenticacao() -> None:

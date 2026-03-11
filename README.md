@@ -93,6 +93,15 @@ Variável opcional de conexão com banco (PostgreSQL):
 - `DB_POOL_RECYCLE_SECONDS` (padrão `300`)
 - Ajuda a renovar conexões antigas e reduzir falhas transitórias de SSL em produção
 
+Variáveis opcionais para proxy reverso (URLs absolutas corretas com HTTPS):
+
+- `PROXY_FIX_X_FOR` (padrão `1` em producao, `0` em desenvolvimento)
+- `PROXY_FIX_X_PROTO` (padrão `1` em producao, `0` em desenvolvimento)
+- `PROXY_FIX_X_HOST` (padrão `1` em producao, `0` em desenvolvimento)
+- `PROXY_FIX_X_PORT` (padrão `0`)
+- `PROXY_FIX_X_PREFIX` (padrão `0`)
+- Ajuste esses valores quando houver mais de uma camada de proxy antes do Flask.
+
 Após alterar variáveis, rode `make restart`.
 
 Em `AMBIENTE_APLICACAO=producao`, a aplicação executa `db upgrade` automaticamente no boot.

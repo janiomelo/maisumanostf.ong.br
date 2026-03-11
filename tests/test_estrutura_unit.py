@@ -108,3 +108,24 @@ def test_factory_define_engine_options_para_postgres(monkeypatch):
     assert opcoes["pool_pre_ping"] is True
     assert opcoes["pool_recycle"] == 180
     assert opcoes["pool_use_lifo"] is True
+
+
+@pytest.mark.unit
+def test_factory_aplica_proxy_fix_em_producao(monkeypatch):
+    monkeypatch.setenv("AMBIENTE_APLICACAO", "producao")
+    monkeypatch.setenv("DATABASE_URL", "sqlite:///:memory:")
+    monkeypatch.setattr(app_module, "_aplicar_migracoes_em_producao", lambda app, ambiente: None)
+
+    app = create_app({"TESTING": True})
+    client = app.test_client()
+
+    response = client.get(
+        "/sitemap.xml",
+        headers={
+            "X-Forwarded-Proto": "https",
+            "X-Forwarded-Host": "maisumanostf.ong.br",
+        },
+    )
+
+    body = response.get_data(as_text=True)
+    assert "<loc>https://maisumanostf.ong.br/</loc>" in body
