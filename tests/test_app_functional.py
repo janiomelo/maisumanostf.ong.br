@@ -64,7 +64,7 @@ def test_home_renderiza_conteudo_essencial(client):
     assert 'property="og:title"' in html
     assert 'property="og:description"' in html
     assert 'property="og:image"' in html
-    assert "social-card.svg" in html
+    assert "social-card.png" in html
     assert "Página de apoios (exige login)" in html
     assert "registro de apoio está disponível" in html
     assert "e exige login" in html
@@ -125,12 +125,11 @@ def test_static_main_js_disponivel(client):
 
 @pytest.mark.functional
 def test_static_social_card_disponivel(client):
-    response = client.get("/static/social-card.svg")
+    response = client.get("/static/social-card.png")
 
     assert response.status_code == 200
-    body = response.get_data(as_text=True)
-    assert "<svg" in body
-    assert "Mais Uma no STF" in body
+    body = response.get_data()
+    assert body.startswith(b"\x89PNG\r\n\x1a\n")
 
 
 @pytest.mark.functional
