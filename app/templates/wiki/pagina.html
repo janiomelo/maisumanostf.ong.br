@@ -17,6 +17,8 @@
 
   {{ pagina.conteudo_html | safe }}
 
-  <p><a href="{{ url_for('wiki.editar_pagina_wiki', slug=pagina.slug) }}">Editar esta página (acesso autenticado)</a></p>
+  {% if usuario_esta_logado and papel_atual in ["editor", "admin"] %}
+    <p><a href="{{ url_for('wiki.editar_pagina_wiki', slug=pagina.slug) }}">Editar esta página</a></p>
+  {% endif %}
 </section>
 {% endblock %}

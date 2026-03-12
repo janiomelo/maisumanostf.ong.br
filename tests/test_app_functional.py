@@ -245,6 +245,34 @@ def test_wiki_estatuto_publico(client):
     assert '<a href="/wiki/">Wiki</a> /' in html
     assert "Criado em:" in html
     assert "Autor: Editorial da campanha Mais Uma no STF" not in html
+    assert "Editar esta página" not in html
+
+
+@pytest.mark.functional
+def test_wiki_pagina_oculta_link_edicao_para_usuario_logado_sem_permissao(client):
+    with client.session_transaction() as sessao:
+        sessao["usuario_email"] = "google.user@teste.local"
+        sessao["papel_atual"] = "nao_editor"
+
+    response = client.get("/wiki/estatuto-basico-ampliado")
+
+    assert response.status_code == 200
+    html = response.get_data(as_text=True)
+    assert "Editar esta página" not in html
+
+
+@pytest.mark.functional
+def test_wiki_pagina_exibe_link_edicao_para_editor(client):
+    client.post(
+        "/entrar",
+        data={"email": "editor@teste.local", "senha": "123456"},
+    )
+
+    response = client.get("/wiki/estatuto-basico-ampliado")
+
+    assert response.status_code == 200
+    html = response.get_data(as_text=True)
+    assert '<a href="/wiki/estatuto-basico-ampliado/editar">Editar esta página</a>' in html
 
 
 @pytest.mark.functional
