@@ -31,7 +31,7 @@ Transparencia sobre os dados e limites da campanha.
 Revisao publica dos textos institucionais.
 """
 
-CONTEUDO_POLITICA_PRIVACIDADE = """# Politica de Privacidade
+CONTEUDO_POLITICA_PRIVACIDADE = """# Política de Privacidade
 
 Esta pagina descreve de forma objetiva quais dados sao coletados e com qual finalidade.
 
@@ -63,7 +63,7 @@ def semear_wiki_inicial() -> None:
     paginas_base = [
         ("estatuto-basico-ampliado", "Estatuto Basico Ampliado", CONTEUDO_WIKI_INICIAL),
         ("estatuto-base", "Estatuto Base", CONTEUDO_ESTATUTO_BASE),
-        ("politica-de-privacidade", "Politica de Privacidade", CONTEUDO_POLITICA_PRIVACIDADE),
+        ("politica-de-privacidade", "Política de Privacidade", CONTEUDO_POLITICA_PRIVACIDADE),
         ("termos-de-uso", "Termos de Uso", CONTEUDO_TERMOS_USO),
     ]
 
