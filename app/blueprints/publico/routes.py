@@ -4,9 +4,9 @@ from sqlalchemy.exc import OperationalError
 from app.dados.modelos import WikiPagina
 from app.domain.campanha import (
     build_chart_payload,
+    build_countdown_initial_state,
     build_countdown_target,
     format_br,
-    get_setting,
     vacancy_dates,
 )
 from app.domain.paginas_gerais import carregar_links_paginas_gerais
@@ -24,8 +24,8 @@ def injetar_paginas_gerais() -> dict[str, object]:
 @publico_bp.get("/")
 def home():
     vacancies = vacancy_dates()
-    default_target = f"{vacancies['fux'].isoformat()}T00:00:00-03:00"
-    target_raw = get_setting("COUNTDOWN_TARGET", default_target)
+    target_raw = build_countdown_target()
+    countdown_initial = build_countdown_initial_state(target_raw)
     chart_payload = build_chart_payload(vacancies)
     vacancy_labels = {
         "fux": format_br(vacancies["fux"]),
@@ -36,6 +36,7 @@ def home():
     html = render_template(
         "publico/home.html",
         countdown_target=target_raw,
+        countdown_initial=countdown_initial,
         chart_payload=chart_payload,
         vacancy_labels=vacancy_labels,
     )

@@ -63,10 +63,10 @@
   >
     <h2 id="countdown-title" class="countdown-kicker">Tempo para garantir o mínimo civilizatório</h2>
     <ul class="countdown-grid" aria-label="Contagem regressiva para a próxima vaga">
-      <li><strong id="cdDays" aria-live="polite">0</strong><span>dias</span></li>
-      <li><strong id="cdHours" aria-live="polite">0</strong><span>horas</span></li>
-      <li><strong id="cdMinutes" aria-live="polite">0</strong><span>min</span></li>
-      <li><strong id="cdSeconds" aria-live="polite">0</strong><span>seg</span></li>
+      <li><strong id="cdDays" aria-live="polite">{{ countdown_initial.days }}</strong><span>dias</span></li>
+      <li><strong id="cdHours" aria-live="polite">{{ countdown_initial.hours }}</strong><span>horas</span></li>
+      <li><strong id="cdMinutes" aria-live="polite">{{ countdown_initial.minutes }}</strong><span>min</span></li>
+      <li><strong id="cdSeconds" aria-live="polite">{{ countdown_initial.seconds }}</strong><span>seg</span></li>
     </ul>
     <p class="countdown-target">Meta atual: 26/04/2028 (Vaga Fux)</p>
 

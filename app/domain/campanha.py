@@ -86,3 +86,34 @@ def build_countdown_target() -> str:
     except ValueError:
         target_dt = datetime.fromisoformat("2028-04-26T00:00:00-03:00")
     return target_dt.isoformat()
+
+
+def build_countdown_initial_state(target_iso: str, now: datetime | None = None) -> dict[str, str]:
+    try:
+        target_dt = datetime.fromisoformat(target_iso)
+    except ValueError:
+        target_dt = datetime.fromisoformat("2028-04-26T00:00:00-03:00")
+
+    if now is None:
+        if target_dt.tzinfo is not None:
+            now = datetime.now(target_dt.tzinfo)
+        else:
+            now = datetime.now()
+
+    diff_total = int((target_dt - now).total_seconds())
+    if diff_total < 0:
+        diff_total = 0
+
+    days = diff_total // 86400
+    diff_total -= days * 86400
+    hours = diff_total // 3600
+    diff_total -= hours * 3600
+    minutes = diff_total // 60
+    seconds = diff_total - (minutes * 60)
+
+    return {
+        "days": str(days),
+        "hours": str(hours).zfill(2),
+        "minutes": str(minutes).zfill(2),
+        "seconds": str(seconds).zfill(2),
+    }

@@ -217,6 +217,29 @@ def test_home_data_alvo_corresponde_ao_valor_configurado(client, monkeypatch):
 
 
 @pytest.mark.functional
+def test_home_renderiza_contagem_inicial_calculada_no_servidor(client, monkeypatch):
+    monkeypatch.setattr(
+        rotas_publico,
+        "build_countdown_initial_state",
+        lambda _target: {
+            "days": "111",
+            "hours": "22",
+            "minutes": "33",
+            "seconds": "44",
+        },
+    )
+
+    response = client.get("/")
+
+    assert response.status_code == 200
+    html = response.get_data(as_text=True)
+    assert 'id="cdDays" aria-live="polite">111<' in html
+    assert 'id="cdHours" aria-live="polite">22<' in html
+    assert 'id="cdMinutes" aria-live="polite">33<' in html
+    assert 'id="cdSeconds" aria-live="polite">44<' in html
+
+
+@pytest.mark.functional
 def test_wiki_indice_publica(client):
     response = client.get("/wiki/")
 
